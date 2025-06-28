@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import OpenAI from 'openai';
 
 import Income from './models/Income.js';
@@ -12,6 +13,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(express.json());
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finance';
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -113,3 +115,5 @@ app.get('/api/overview', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+export default app;
