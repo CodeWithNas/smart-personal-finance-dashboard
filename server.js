@@ -1,9 +1,14 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import OpenAI from 'openai';
 
 import Income from './models/Income.js';
 import Expense from './models/Expense.js';
 import Budget from './models/Budget.js';
+
+dotenv.config();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(express.json());
@@ -42,6 +47,32 @@ async function checkBudgets(userId) {
   });
   return result;
 }
+
+app.post('/api/categorize', async (req, res) => {
+  const { expenseDescription } = req.body || {};
+  if (!expenseDescription || typeof expenseDescription !== 'string') {
+    return res.status(400).json({ error: 'expenseDescription required' });
+  }
+  const lower = expenseDescription.toLowerCase();
+  if (/(aldi|lidl|rewe)/i.test(lower)) {
+    return res.json({ category: 'Groceries' });
+  }
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        { role: 'user', content: `Categorize this expense: ${expenseDescription}\nCategories: Food, Groceries, Rent, Transport, Entertainment, Insurance, Utilities, Other` }
+      ],
+      max_tokens: 10,
+      temperature: 0
+    });
+    const category = completion.choices[0]?.message?.content?.trim() || 'Other';
+    res.json({ category });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to categorize' });
+  }
+});
 
 app.get('/api/overview', async (req, res) => {
   try {
