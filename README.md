@@ -15,3 +15,14 @@ This project is a simple Node.js backend that provides API endpoints for managin
 ```
 
 `savings` is calculated as `income - expenses`.
+
+## Categorize Endpoint
+
+`POST /api/categorize` accepts a JSON body with an `expenseDescription` string.
+It returns a suggested category using OpenAI or keyword matching.
+
+```
+{
+  "category": "Groceries"
+}
+```
