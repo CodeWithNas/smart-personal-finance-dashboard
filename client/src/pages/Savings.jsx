@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { TextInput, NumberInput, DateInput } from '../components/forms';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { PieChartWidget } from '../components/charts';
 
 const Savings = ({ onChange }) => {
   const [savings, setSavings] = useState([]);
@@ -216,24 +210,7 @@ const Savings = ({ onChange }) => {
 
           <div className="bg-gray-100 p-4 rounded">
             <h2 className="text-lg font-semibold mb-2">Savings Distribution</h2>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  dataKey="value"
-                  nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label
-                >
-                  {pieData.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <PieChartWidget data={pieData} colors={COLORS} outerRadius={80} />
           </div>
         </>
       )}
