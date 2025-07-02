@@ -3,6 +3,8 @@ import api from '../services/api';
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     type: 'income',
     amount: '',
@@ -17,12 +19,17 @@ const Income = () => {
   const categories = ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Other'];
 
   const fetchIncomes = async () => {
+    setLoading(true);
+    setError('');
     try {
       const res = await api.get('/transactions');
       const onlyIncomes = res.data.filter((txn) => txn.type === 'income');
       setIncomes(onlyIncomes);
     } catch (err) {
       console.error('Error fetching incomes:', err.response?.data || err.message);
+      setError(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,6 +56,7 @@ const Income = () => {
       fetchIncomes();
     } catch (err) {
       console.error('Error saving income:', err.response?.data || err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 
@@ -59,6 +67,7 @@ const Income = () => {
       fetchIncomes();
     } catch (err) {
       console.error('Error deleting income:', err.response?.data || err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 
@@ -77,6 +86,7 @@ const Income = () => {
   return (
     <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Income Tracker</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       {/* Income Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -170,7 +180,9 @@ const Income = () => {
           </div>
         </div>
 
-        {filtered.length === 0 ? (
+        {loading ? (
+          <p className="text-gray-500">Loading incomes...</p>
+        ) : filtered.length === 0 ? (
           <p className="text-gray-500">No income added yet.</p>
         ) : (
           <ul className="space-y-3">

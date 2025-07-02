@@ -6,6 +6,7 @@ const Expenses = () => {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const categories = [
     'Food',
@@ -18,6 +19,8 @@ const Expenses = () => {
   ];
 
   const fetchExpenses = async () => {
+    setLoading(true);
+    setError('');
     try {
       const res = await api.get('/transactions');
       const filtered = res.data.filter(
@@ -26,6 +29,7 @@ const Expenses = () => {
       setExpenses(filtered);
     } catch (err) {
       console.error('Failed to load expenses:', err.response?.data || err.message);
+      setError(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -44,6 +48,7 @@ const Expenses = () => {
   return (
     <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Expenses</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <div className="flex flex-wrap gap-4 mb-6">
         <div>
