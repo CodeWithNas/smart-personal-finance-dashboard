@@ -1,6 +1,7 @@
 import express from 'express';
 import Goal from '../models/Goal.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { validateGoal } from '../middleware/validation.js';
 
 const router = express.Router();
 router.use(authMiddleware);
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
 });
 
 // ✅ POST a new goal
-router.post('/', async (req, res) => {
+router.post('/', validateGoal, async (req, res) => {
   try {
     const { goalName, targetAmount, deadline } = req.body;
 

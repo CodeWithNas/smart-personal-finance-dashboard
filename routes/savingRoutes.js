@@ -1,12 +1,13 @@
 import express from 'express';
 import Saving from '../models/Saving.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { validateSaving, validateSavingContribution, validateSavingUpdate } from '../middleware/validation.js';
 
 const router = express.Router();
 router.use(authMiddleware);
 
 // ✅ POST: Create a new saving goal
-router.post('/', async (req, res) => {
+router.post('/', validateSaving, async (req, res) => {
   try {
     const { goal, targetAmount, contribution, dueDate } = req.body;
     const newSaving = new Saving({
@@ -25,7 +26,7 @@ router.post('/', async (req, res) => {
 });
 
 // ✅ POST: Add contribution to an existing saving
-router.post('/:id/contribute', async (req, res) => {
+router.post('/:id/contribute', validateSavingContribution, async (req, res) => {
   try {
     const { amount } = req.body;
     const saving = await Saving.findOne({ _id: req.params.id, userId: req.user.id });
@@ -68,7 +69,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ✅ PUT: Update an existing saving goal
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateSavingUpdate, async (req, res) => {
   try {
     const { goal, targetAmount, dueDate } = req.body;
 

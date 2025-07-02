@@ -1,6 +1,7 @@
 import express from 'express';
 import Transaction from '../models/Transaction.js';
-import authMiddleware from '../middleware/authMiddleware.js'; // ✅ Auth middleware
+import authMiddleware from '../middleware/authMiddleware.js';
+import { validateTransaction, validateTransactionUpdate } from '../middleware/validation.js';
 
 const router = express.Router();
 
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // ✅ POST a new transaction (auto-assigns userId from token)
-router.post('/', async (req, res) => {
+router.post('/', validateTransaction, async (req, res) => {
   try {
     const transaction = new Transaction({
       ...req.body,
@@ -53,7 +54,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ✅ PUT (Update) a transaction owned by the logged-in user
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateTransactionUpdate, async (req, res) => {
   try {
     const updated = await Transaction.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
