@@ -3,22 +3,13 @@ import api from '../services/api';
 import { CategorySelect } from '../components/forms';
 import { toast } from 'react-hot-toast';
 import { Spinner } from '../components/loading';
+import { expenseCategories, formatDate } from '../utils';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [loading, setLoading] = useState(true);
-
-  const categories = [
-    'Food',
-    'Rent',
-    'Utilities',
-    'Entertainment',
-    'Health',
-    'Transport',
-    'Other',
-  ];
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -70,7 +61,7 @@ const Expenses = () => {
           name="filterCategory"
           value={filterCategory}
           onChange={(e) => setFilterCategory(e.target.value)}
-          options={categories}
+          options={expenseCategories}
           placeholder="All"
         />
       </div>
@@ -88,7 +79,7 @@ const Expenses = () => {
                 <span className="text-red-600 font-semibold">-€{exp.amount}</span>
               </div>
               <div className="text-sm text-gray-600">
-                {new Date(exp.date).toLocaleDateString()} – {exp.description}
+                {formatDate(exp.date)} – {exp.description}
               </div>
             </li>
           ))}

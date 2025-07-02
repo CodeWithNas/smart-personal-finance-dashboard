@@ -8,6 +8,7 @@ import {
   CategorySelect,
 } from '../components/forms';
 import { Spinner } from '../components/loading';
+import { incomeCategories, expenseCategories, formatDate } from '../utils';
 
 const Transactions = () => {
   const [formData, setFormData] = useState({
@@ -25,8 +26,6 @@ const Transactions = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const incomeCategories = ['Salary', 'Freelance', 'Bonus', 'Gift', 'Other'];
-  const expenseCategories = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Health', 'Transport', 'Other'];
 
   const dynamicCategories = formData.type === 'income' ? incomeCategories : expenseCategories;
 
@@ -244,7 +243,7 @@ const Transactions = () => {
                     </span>
                   </div>
                   <div className="text-sm text-gray-600">
-                    {new Date(txn.date).toLocaleDateString()} - {txn.description}
+                    {formatDate(txn.date)} - {txn.description}
                   </div>
                   <button
                     onClick={() => handleEdit(txn)}
