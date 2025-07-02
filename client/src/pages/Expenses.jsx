@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { CategorySelect } from '../components/forms';
 import { toast } from 'react-hot-toast';
+import { Spinner } from '../components/loading';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -46,7 +47,10 @@ const Expenses = () => {
   });
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <div
+      className="max-w-2xl mx-auto bg-white p-6 rounded shadow"
+      aria-busy={loading}
+    >
       <h1 className="text-2xl font-bold mb-4">Expenses</h1>
 
       <div className="flex flex-wrap gap-4 mb-6">
@@ -71,7 +75,7 @@ const Expenses = () => {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading expenses...</p>
+        <Spinner />
       ) : filteredExpenses.length === 0 ? (
         <p className="text-gray-500">No expenses recorded.</p>
       ) : (

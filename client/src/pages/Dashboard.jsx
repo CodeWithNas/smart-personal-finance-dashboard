@@ -5,6 +5,7 @@ import {
   PieChartWidget,
   LineChartWidget,
 } from '../components/charts';
+import { Spinner } from '../components/loading';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#a1e3a1', '#ffd700', '#a1cfff'];
 
@@ -86,11 +87,14 @@ const Dashboard = () => {
     }, []);
 
   return (
-    <div className="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+    <div
+      className="max-w-5xl mx-auto bg-white p-6 rounded shadow"
+      aria-busy={loading}
+    >
       <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
       {loading ? (
-        <p>Loading...</p>
+        <Spinner />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 text-center">
