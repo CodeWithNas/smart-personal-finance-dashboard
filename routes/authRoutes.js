@@ -20,7 +20,20 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({ email, password: hashedPassword });
 
-    res.status(201).json({ message: 'User registered', userId: newUser._id });
+    const token = jwt.sign(
+      { id: newUser._id, email },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+      })
+      .status(201)
+      .json({ message: 'User registered', userId: newUser._id, token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
@@ -46,7 +59,13 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' }
     );
 
-    res.json({ token });
+    res
+      .cookie('token', token, {
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: process.env.NODE_ENV === 'production'
+      })
+      .json({ token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });

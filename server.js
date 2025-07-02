@@ -5,6 +5,7 @@ import cors from 'cors';
 import OpenAI from 'openai';
 import multer from 'multer';
 import fs from 'fs';
+import cookieParser from 'cookie-parser';
 
 import Income from './models/Income.js';
 import Expense from './models/Expense.js';
@@ -28,6 +29,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 app.use('/api/transactions', transactionRoutes);
