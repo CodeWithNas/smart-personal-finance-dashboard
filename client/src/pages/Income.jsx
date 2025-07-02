@@ -7,6 +7,7 @@ import {
   DateInput,
   CategorySelect,
 } from '../components/forms';
+import { Spinner } from '../components/loading';
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
@@ -91,7 +92,10 @@ const Income = () => {
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-6 rounded shadow">
+    <div
+      className="max-w-2xl mx-auto bg-white p-6 rounded shadow"
+      aria-busy={loading}
+    >
       <h1 className="text-2xl font-bold mb-4">Income Tracker</h1>
 
       {/* Income Form */}
@@ -168,7 +172,7 @@ const Income = () => {
         </div>
 
         {loading ? (
-          <p className="text-gray-500">Loading incomes...</p>
+          <Spinner />
         ) : filtered.length === 0 ? (
           <p className="text-gray-500">No income added yet.</p>
         ) : (

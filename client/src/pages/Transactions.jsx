@@ -7,6 +7,7 @@ import {
   DateInput,
   CategorySelect,
 } from '../components/forms';
+import { Spinner } from '../components/loading';
 
 const Transactions = () => {
   const [formData, setFormData] = useState({
@@ -115,7 +116,10 @@ const Transactions = () => {
   }, []);
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-6 rounded shadow">
+    <div
+      className="max-w-xl mx-auto bg-white p-6 rounded shadow"
+      aria-busy={loading}
+    >
       <h1 className="text-2xl font-bold mb-4">
         {isEditing ? 'Edit Transaction' : 'Add Transaction'}
       </h1>
@@ -215,7 +219,7 @@ const Transactions = () => {
         </div>
 
         {loading ? (
-          <p className="text-gray-500">Loading transactions...</p>
+          <Spinner />
         ) : transactions.length === 0 ? (
           <p className="text-gray-500">No transactions yet.</p>
         ) : (
