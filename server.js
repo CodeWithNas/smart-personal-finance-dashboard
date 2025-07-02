@@ -103,7 +103,7 @@ async function checkRecurringTransaction(userId, vendor, amount) {
   }
 }
 
-app.post('/api/categorize', async (req, res) => {
+app.post('/api/categorize', authMiddleware, async (req, res) => {
   const { expenseDescription } = req.body || {};
   if (!expenseDescription || typeof expenseDescription !== 'string') {
     return res.status(400).json({ error: 'expenseDescription required' });
