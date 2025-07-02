@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { TextInput, NumberInput, DateInput } from '../components/forms';
 import { PieChartWidget } from '../components/charts';
+import { formatDate } from '../utils';
 
 const Savings = ({ onChange }) => {
   const [savings, setSavings] = useState([]);
@@ -182,7 +183,7 @@ const Savings = ({ onChange }) => {
                           .sort((a, b) => new Date(b.date) - new Date(a.date))
                           .map((c, idx) => (
                             <li key={idx}>
-                              €{c.amount} on {new Date(c.date).toLocaleDateString()}
+                              €{c.amount} on {formatDate(c.date)}
                             </li>
                           ))}
                       </ul>

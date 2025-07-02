@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import { TextInput, NumberInput, DateInput } from '../components/forms';
+import { formatDate } from '../utils';
 
 const Investments = () => {
   const [investments, setInvestments] = useState([]);
@@ -125,7 +126,7 @@ const Investments = () => {
               <span className="font-medium">{inv.name} ({inv.type})</span>
               <span className="text-green-600 font-semibold">€{inv.amount}</span>
             </div>
-            <div className="text-sm text-gray-600">{new Date(inv.date).toLocaleDateString()}</div>
+            <div className="text-sm text-gray-600">{formatDate(inv.date)}</div>
             <div className="flex gap-2 text-sm mt-2">
               <button onClick={() => handleEdit(inv)} className="text-blue-500">Edit</button>
               <button onClick={() => handleDelete(inv._id)} className="text-red-500">Delete</button>

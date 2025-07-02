@@ -6,8 +6,8 @@ import {
   DateInput,
   CategorySelect,
 } from '../components/forms';
+import { expenseCategories } from '../utils';
 
-const categories = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Health', 'Transport', 'Other'];
 
 const Budget = () => {
   const [budgets, setBudgets] = useState([]);
@@ -80,7 +80,7 @@ const Budget = () => {
           name="category"
           value={formData.category}
           onChange={handleChange}
-          options={categories}
+          options={expenseCategories}
           required
         />
 

@@ -8,6 +8,7 @@ import {
   CategorySelect,
 } from '../components/forms';
 import { Spinner } from '../components/loading';
+import { incomeCategories, formatDate } from '../utils';
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
@@ -23,7 +24,6 @@ const Income = () => {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
 
-  const categories = ['Salary', 'Freelance', 'Business', 'Investment', 'Gift', 'Other'];
 
   const fetchIncomes = async () => {
     setLoading(true);
@@ -113,7 +113,7 @@ const Income = () => {
           name="category"
           value={formData.category}
           onChange={handleChange}
-          options={categories}
+          options={incomeCategories}
           required
         />
 
@@ -166,7 +166,7 @@ const Income = () => {
               className="border p-2 rounded"
             >
               <option value="">All</option>
-              {categories.map((cat) => (
+              {incomeCategories.map((cat) => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
@@ -185,7 +185,7 @@ const Income = () => {
                   <div>
                     <div className="font-medium">{item.category}</div>
                     <div className="text-sm text-gray-600">
-                      {new Date(item.date).toLocaleDateString()} – {item.description || '—'}
+                      {formatDate(item.date)} – {item.description || '—'}
                     </div>
                   </div>
                   <div className="text-green-600 font-semibold">€{item.amount}</div>

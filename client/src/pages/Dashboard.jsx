@@ -6,6 +6,7 @@ import {
   LineChartWidget,
 } from '../components/charts';
 import { Spinner } from '../components/loading';
+import { formatDate } from '../utils';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#a1e3a1', '#ffd700', '#a1cfff'];
 
@@ -165,7 +166,7 @@ const Dashboard = () => {
                   </span>
                 </div>
                 <p className="text-sm text-gray-700">
-                  {new Date(txn.date).toLocaleDateString()}
+                  {formatDate(txn.date)}
                 </p>
               </li>
             ))}

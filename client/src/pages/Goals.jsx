@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { TextInput, NumberInput, DateInput } from '../components/forms';
+import { formatDate } from '../utils';
 
 const Goals = () => {
   const [formData, setFormData] = useState({
@@ -94,7 +95,7 @@ const Goals = () => {
                 <div className="text-gray-600 text-sm">
                   Target: €{goal.targetAmount}
                   {goal.deadline && (
-                    <> | Deadline: {new Date(goal.deadline).toLocaleDateString()}</>
+                    <> | Deadline: {formatDate(goal.deadline)}</>
                   )}
                 </div>
                 <button
