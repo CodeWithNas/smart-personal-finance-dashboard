@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { toast } from 'react-hot-toast';
 import {
   TextInput,
   NumberInput,
@@ -22,7 +23,6 @@ const Transactions = () => {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   const incomeCategories = ['Salary', 'Freelance', 'Bonus', 'Gift', 'Other'];
   const expenseCategories = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Health', 'Transport', 'Other'];
@@ -38,13 +38,12 @@ const Transactions = () => {
 
   const fetchTransactions = async () => {
     setLoading(true);
-    setError('');
     try {
       const response = await api.get('/transactions');
       setTransactions(response.data);
     } catch (error) {
       console.error('Error fetching transactions:', error.response?.data || error.message);
-      setError(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
     }
@@ -55,9 +54,10 @@ const Transactions = () => {
     try {
       await api.delete(`/transactions/${id}`);
       fetchTransactions();
+      toast.success('Transaction deleted');
     } catch (error) {
       console.error('Error deleting transaction:', error.response?.data || error.message);
-      setError(error.response?.data?.message || error.message);
+      toast.error(error.response?.data?.message || error.message);
     }
   };
 
@@ -96,15 +96,17 @@ const Transactions = () => {
     try {
       if (isEditing) {
         await api.put(`/transactions/${editId}`, payload);
+        toast.success('Transaction updated');
       } else {
         await api.post('/transactions', payload);
+        toast.success('Transaction saved');
       }
 
       cancelEdit();
       fetchTransactions();
     } catch (err) {
       console.error('Error submitting transaction:', err.response?.data || err.message);
-      setError(err.response?.data?.message || err.message);
+      toast.error(err.response?.data?.message || err.message);
     }
   };
 
@@ -117,7 +119,6 @@ const Transactions = () => {
       <h1 className="text-2xl font-bold mb-4">
         {isEditing ? 'Edit Transaction' : 'Add Transaction'}
       </h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
