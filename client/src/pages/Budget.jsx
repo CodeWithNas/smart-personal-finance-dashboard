@@ -1,5 +1,11 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import {
+  TextInput,
+  NumberInput,
+  DateInput,
+  CategorySelect,
+} from '../components/forms';
 
 const categories = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Health', 'Transport', 'Other'];
 
@@ -69,47 +75,31 @@ const Budget = () => {
       <h1 className="text-2xl font-bold mb-4">Monthly Budgets</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          >
-            <option value="">-- Select Category --</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CategorySelect
+          label="Category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          options={categories}
+          required
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Amount (€)</label>
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <NumberInput
+          label="Amount (€)"
+          name="amount"
+          value={formData.amount}
+          onChange={handleChange}
+          required
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Month</label>
-          <input
-            type="month"
-            name="month"
-            value={formData.month}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <DateInput
+          label="Month"
+          type="month"
+          name="month"
+          value={formData.month}
+          onChange={handleChange}
+          required
+        />
 
         <div className="flex gap-2">
           <button
@@ -138,12 +128,12 @@ const Budget = () => {
         <h2 className="text-xl font-semibold mb-3">Budgets</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Filter by Month</label>
-          <input
+          <DateInput
+            label="Filter by Month"
             type="month"
+            name="filterMonth"
             value={filterMonth}
             onChange={(e) => setFilterMonth(e.target.value)}
-            className="border p-2 rounded"
           />
         </div>
 

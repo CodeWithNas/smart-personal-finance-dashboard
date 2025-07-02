@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../services/api'; // Make sure this points to your axios setup
+import { TextInput } from '../components/forms';
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -29,27 +30,25 @@ const Register = () => {
 
         {error && <p className="text-red-500 mb-2">{error}</p>}
 
-        <label className="block mb-2">
-          <span>Email</span>
-          <input
-            type="email"
-            className="w-full mt-1 p-2 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </label>
+        <TextInput
+          type="email"
+          name="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          className="mb-2"
+          required
+        />
 
-        <label className="block mb-4">
-          <span>Password</span>
-          <input
-            type="password"
-            className="w-full mt-1 p-2 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        <TextInput
+          type="password"
+          name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className="mb-4"
+          required
+        />
 
         <button
           type="submit"

@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import {
+  TextInput,
+  NumberInput,
+  DateInput,
+  CategorySelect,
+} from '../components/forms';
 
 const Income = () => {
   const [incomes, setIncomes] = useState([]);
@@ -90,57 +96,38 @@ const Income = () => {
 
       {/* Income Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Amount (€)</label>
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <NumberInput
+          label="Amount (€)"
+          name="amount"
+          value={formData.amount}
+          onChange={handleChange}
+          required
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Category</label>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          >
-            <option value="">-- Select Category --</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
+        <CategorySelect
+          label="Category"
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          options={categories}
+          required
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <DateInput
+          label="Date"
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          required
+        />
 
-        <div>
-          <label className="block mb-1 font-medium">Description</label>
-          <input
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="e.g. Bonus or payment note"
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <TextInput
+          label="Description"
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          placeholder="e.g. Bonus or payment note"
+        />
 
         <button
           type="submit"

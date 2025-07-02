@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { TextInput, NumberInput, DateInput } from '../components/forms';
 import {
   PieChart,
   Pie,
@@ -105,55 +106,43 @@ const Savings = ({ onChange }) => {
       <h1 className="text-2xl font-bold mb-4">Savings Goals</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-        <div>
-          <label className="block mb-1 font-medium">Goal Name</label>
-          <input
-            type="text"
-            name="goal"
-            value={formData.goal}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <TextInput
+          label="Goal Name"
+          name="goal"
+          value={formData.goal}
+          onChange={handleChange}
+          required
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block mb-1 font-medium">Target Amount (€)</label>
-            <input
-              type="number"
+            <NumberInput
+              label="Target Amount (€)"
               name="targetAmount"
               value={formData.targetAmount}
               onChange={handleChange}
               required
-              className="w-full border p-2 rounded"
             />
           </div>
 
           <div>
-            <label className="block mb-1 font-medium">Contribution (€)</label>
-            <input
-              type="number"
+            <NumberInput
+              label="Contribution (€)"
               name="contribution"
               value={formData.contribution}
               onChange={handleChange}
-              className="w-full border p-2 rounded"
               disabled={formData.editingId !== null}
             />
           </div>
         </div>
 
-        <div>
-          <label className="block mb-1 font-medium">Due Date</label>
-          <input
-            type="date"
-            name="dueDate"
-            value={formData.dueDate}
-            onChange={handleChange}
-            required
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <DateInput
+          label="Due Date"
+          name="dueDate"
+          value={formData.dueDate}
+          onChange={handleChange}
+          required
+        />
 
         <button
           type="submit"
