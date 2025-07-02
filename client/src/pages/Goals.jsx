@@ -85,7 +85,7 @@ const Goals = () => {
       <div className="mt-10">
         <h2 className="text-xl font-semibold mb-3">Your Goals</h2>
         {goals.length === 0 ? (
-          <p className="text-gray-500">No goals yet.</p>
+          <p className="text-gray-700">No goals yet.</p>
         ) : (
           <ul className="space-y-4">
             {goals.map((goal) => (

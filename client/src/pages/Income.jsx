@@ -147,8 +147,9 @@ const Income = () => {
 
         <div className="flex flex-wrap gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Filter by Month</label>
+            <label htmlFor="incomeFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
             <input
+              id="incomeFilterMonth"
               type="month"
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
@@ -157,8 +158,9 @@ const Income = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Filter by Category</label>
+            <label htmlFor="incomeFilterCategory" className="block text-sm font-medium mb-1">Filter by Category</label>
             <select
+              id="incomeFilterCategory"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="border p-2 rounded"
@@ -174,7 +176,7 @@ const Income = () => {
         {loading ? (
           <Spinner />
         ) : filtered.length === 0 ? (
-          <p className="text-gray-500">No income added yet.</p>
+          <p className="text-gray-700">No income added yet.</p>
         ) : (
           <ul className="space-y-3">
             {filtered.map((item) => (
