@@ -13,6 +13,7 @@ import Insights from './pages/Insights';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Transactions from './pages/Transactions';
+import NotFound from './pages/NotFound';
 
 const routes = [
   {
@@ -40,6 +41,11 @@ const routes = [
   {
     path: '/register',
     element: <Register />,
+    protected: false,
+  },
+  {
+    path: '*',
+    element: <NotFound />,
     protected: false,
   },
 ];
