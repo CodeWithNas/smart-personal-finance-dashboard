@@ -1,9 +1,10 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import routes from './routes';
+import { useAuth } from './context/AuthContext';
 
 function App() {
-  const isAuthenticated = !!localStorage.getItem('token');
+  const { isAuthenticated } = useAuth();
 
   const renderRoutes = (routes) =>
     routes.map(({ path, element, protected: isProtected, children }) => {
