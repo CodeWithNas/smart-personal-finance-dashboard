@@ -1,0 +1,6 @@
+/* src/components/Layout.css */
+.app-layout {
+    display: flex;
+    min-height: 100vh;
+  }
+  

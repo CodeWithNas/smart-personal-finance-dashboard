@@ -1,13 +1,65 @@
-function Register() {
+// src/pages/Register.jsx
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from '../services/api'; // Make sure this points to your axios setup
+
+const Register = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await axios.post('/auth/register', { email, password });
+      navigate('/login'); // Redirect after successful registration
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || 'Registration failed');
+    }
+  };
+
   return (
-    <div className="max-w-md mx-auto bg-white p-6 shadow">
-      <h1 className="text-2xl font-bold mb-4">Register</h1>
-      <form className="space-y-4">
-        <input className="w-full border p-2" placeholder="Email" />
-        <input className="w-full border p-2" placeholder="Password" type="password" />
-        <button type="submit" className="w-full bg-blue-600 text-white p-2">Sign Up</button>
+    <div className="min-h-screen flex items-center justify-center">
+      <form onSubmit={handleRegister} className="w-full max-w-sm p-6 bg-white shadow rounded">
+        <h1 className="text-2xl mb-4 font-bold">Register</h1>
+
+        {error && <p className="text-red-500 mb-2">{error}</p>}
+
+        <label className="block mb-2">
+          <span>Email</span>
+          <input
+            type="email"
+            className="w-full mt-1 p-2 border rounded"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </label>
+
+        <label className="block mb-4">
+          <span>Password</span>
+          <input
+            type="password"
+            className="w-full mt-1 p-2 border rounded"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </label>
+
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+        >
+          Register
+        </button>
       </form>
     </div>
   );
-}
+};
+
 export default Register;

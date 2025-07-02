@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const GoalSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -8,4 +8,6 @@ const GoalSchema = new mongoose.Schema({
   deadline: { type: Date }
 });
 
-module.exports = mongoose.model('Goal', GoalSchema);
+const Goal = mongoose.model('Goal', GoalSchema);
+
+export default Goal;

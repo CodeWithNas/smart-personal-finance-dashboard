@@ -1,10 +1,28 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-const ExpenseSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  amount: { type: Number, required: true },
-  category: { type: String },
-  date: { type: Date, default: Date.now }
+const expenseSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+  amount: {
+    type: Number,
+    required: true
+  },
+  category: {
+    type: String,
+    default: 'Other'
+  },
+  description: {
+    type: String
+  },
+  date: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-module.exports = mongoose.model('Expense', ExpenseSchema);
+const Expense = mongoose.model('Expense', expenseSchema);
+
+export default Expense;

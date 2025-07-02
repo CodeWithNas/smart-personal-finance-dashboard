@@ -1,30 +1,33 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import Transactions from './pages/Transactions';
-import Budget from './pages/Budget';
+// src/App.jsx
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import routes from './routes';
 
 function App() {
+  const isAuthenticated = !!localStorage.getItem('token');
+
+  const renderRoutes = (routes) =>
+    routes.map(({ path, element, protected: isProtected, children }) => {
+      if (isProtected && !isAuthenticated) {
+        return <Route key={path} path={path} element={<Navigate to="/login" />} />;
+      }
+
+      if (children) {
+        return (
+          <Route key={path} path={path} element={element}>
+            {children.map((child) => (
+              <Route key={child.path} path={child.path} element={child.element} />
+            ))}
+          </Route>
+        );
+      }
+
+      return <Route key={path} path={path} element={element} />;
+    });
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white p-4 flex space-x-4">
-        <Link to="/login">Login</Link>
-        <Link to="/register">Register</Link>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/transactions">Transactions</Link>
-        <Link to="/budget">Budget</Link>
-      </nav>
-      <div className="p-4">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/transactions" element={<Transactions />} />
-          <Route path="/budget" element={<Budget />} />
-        </Routes>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>{renderRoutes(routes)}</Routes>
+    </BrowserRouter>
   );
 }
 

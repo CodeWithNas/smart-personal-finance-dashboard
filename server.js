@@ -12,12 +12,34 @@ import Budget from './models/Budget.js';
 import Transaction from './models/Transaction.js';
 import Goal from './models/Goal.js';
 
+import transactionRoutes from './routes/transactionRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import incomeRoutes from './routes/incomeRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js';
+import expenseRoutes from './routes/expenseRoutes.js'; 
+import savingRoutes from './routes/savingRoutes.js';
+import investmentRoutes from './routes/investmentRoutes.js';
+import goalRoutes from './routes/goalsRoutes.js';
+import insightsRoutes from './routes/insightsRoutes.js';
+import authMiddleware from './middleware/authMiddleware.js'; 
+
 dotenv.config();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const app = express();
 app.use(express.json());
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/budget', budgetRoutes); 
+app.use('/api/expenses', expenseRoutes); 
+app.use('/api/savings', savingRoutes);
+app.use('/api/investments', investmentRoutes);
+app.use('/api/goals', goalRoutes);
+app.use('/api/insights', insightsRoutes);
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/finance';
@@ -107,13 +129,10 @@ app.post('/api/categorize', async (req, res) => {
   }
 });
 
-app.get('/api/overview', async (req, res) => {
+// ✅ Protected: Overview
+app.get('/api/overview', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user && req.user._id;
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
+    const userId = req.user._id;
     const start = startOfCurrentMonth();
     const end = endOfCurrentMonth();
 
@@ -144,11 +163,9 @@ app.get('/api/overview', async (req, res) => {
   }
 });
 
-app.post('/api/upload', upload.single('file'), async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+// ✅ Protected: Upload
+app.post('/api/upload', authMiddleware, upload.single('file'), async (req, res) => {
+  const userId = req.user._id;
   if (!req.file) {
     return res.status(400).json({ error: 'File required' });
   }
@@ -182,13 +199,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-app.post('/api/goals', async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+// ✅ Protected: Goals
+app.post('/api/goals', authMiddleware, async (req, res) => {
   try {
-    const goal = await Goal.create({ ...req.body, userId });
+    const goal = await Goal.create({ ...req.body, userId: req.user._id });
     res.json(goal);
   } catch (err) {
     console.error(err);
@@ -196,20 +210,18 @@ app.post('/api/goals', async (req, res) => {
   }
 });
 
-app.get('/api/goals', async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-  const goals = await Goal.find({ userId });
+app.get('/api/goals', authMiddleware, async (req, res) => {
+  const goals = await Goal.find({ userId: req.user._id });
   res.json(goals);
 });
 
-app.put('/api/goals/:id', async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+app.put('/api/goals/:id', authMiddleware, async (req, res) => {
   try {
-    const goal = await Goal.findOneAndUpdate({ _id: req.params.id, userId }, req.body, { new: true });
+    const goal = await Goal.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      req.body,
+      { new: true }
+    );
     if (!goal) return res.status(404).json({ error: 'Goal not found' });
     res.json(goal);
   } catch (err) {
@@ -218,11 +230,9 @@ app.put('/api/goals/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/goals/:id', async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+app.delete('/api/goals/:id', authMiddleware, async (req, res) => {
   try {
-    const goal = await Goal.findOneAndDelete({ _id: req.params.id, userId });
+    const goal = await Goal.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
     if (!goal) return res.status(404).json({ error: 'Goal not found' });
     res.json({ success: true });
   } catch (err) {
@@ -231,10 +241,10 @@ app.delete('/api/goals/:id', async (req, res) => {
   }
 });
 
-app.get('/api/insights', async (req, res) => {
-  const userId = req.user && req.user._id;
-  if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+// ✅ Protected: Insights
+app.get('/api/insights', authMiddleware, async (req, res) => {
   try {
+    const userId = req.user._id;
     const start = startOfCurrentMonth();
     const end = endOfCurrentMonth();
     const topCatAgg = await Expense.aggregate([
