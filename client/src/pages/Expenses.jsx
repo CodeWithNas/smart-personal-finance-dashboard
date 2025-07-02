@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { CategorySelect } from '../components/forms';
 
 const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
@@ -61,21 +62,14 @@ const Expenses = () => {
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Filter by Category</label>
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="">All</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CategorySelect
+          label="Filter by Category"
+          name="filterCategory"
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+          options={categories}
+          placeholder="All"
+        />
       </div>
 
       {loading ? (

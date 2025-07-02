@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { TextInput, NumberInput, DateInput } from '../components/forms';
 
 const Goals = () => {
   const [formData, setFormData] = useState({
@@ -53,38 +54,26 @@ const Goals = () => {
     <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
       <h1 className="text-2xl font-bold mb-4">Set a Financial Goal</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1 font-medium">Goal Name</label>
-          <input
-            type="text"
-            name="goalName"
-            value={formData.goalName}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium">Target Amount</label>
-          <input
-            type="number"
-            name="targetAmount"
-            value={formData.targetAmount}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1 font-medium">Deadline</label>
-          <input
-            type="date"
-            name="deadline"
-            value={formData.deadline}
-            onChange={handleChange}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <TextInput
+          label="Goal Name"
+          name="goalName"
+          value={formData.goalName}
+          onChange={handleChange}
+          required
+        />
+        <NumberInput
+          label="Target Amount"
+          name="targetAmount"
+          value={formData.targetAmount}
+          onChange={handleChange}
+          required
+        />
+        <DateInput
+          label="Deadline"
+          name="deadline"
+          value={formData.deadline}
+          onChange={handleChange}
+        />
         <button
           type="submit"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

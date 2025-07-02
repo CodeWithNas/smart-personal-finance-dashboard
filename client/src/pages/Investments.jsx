@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
+import { TextInput, NumberInput, DateInput } from '../components/forms';
 
 const Investments = () => {
   const [investments, setInvestments] = useState([]);
@@ -72,10 +73,33 @@ const Investments = () => {
       <h2 className="text-2xl font-bold mb-4">{isEditing ? 'Edit' : 'Add'} Investment</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input name="name" value={formData.name} onChange={handleChange} placeholder="Investment name" className="w-full border p-2 rounded" required />
-        <input name="amount" type="number" value={formData.amount} onChange={handleChange} placeholder="Amount" className="w-full border p-2 rounded" required />
-        <input name="type" value={formData.type} onChange={handleChange} placeholder="Type (e.g. ETF, Stock)" className="w-full border p-2 rounded" required />
-        <input name="date" type="date" value={formData.date} onChange={handleChange} className="w-full border p-2 rounded" required />
+        <TextInput
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Investment name"
+          required
+        />
+        <NumberInput
+          name="amount"
+          value={formData.amount}
+          onChange={handleChange}
+          placeholder="Amount"
+          required
+        />
+        <TextInput
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          placeholder="Type (e.g. ETF, Stock)"
+          required
+        />
+        <DateInput
+          name="date"
+          value={formData.date}
+          onChange={handleChange}
+          required
+        />
 
         <div className="flex gap-3">
           <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded">

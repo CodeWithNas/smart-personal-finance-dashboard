@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { TextInput } from '../components/forms';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -41,23 +42,23 @@ const Login = () => {
 
         {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-        <input
+        <TextInput
           type="email"
           name="email"
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="mb-4 p-2 border w-full rounded"
+          className="mb-4"
           required
         />
 
-        <input
+        <TextInput
           type="password"
           name="password"
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          className="mb-4 p-2 border w-full rounded"
+          className="mb-4"
           required
         />
 
