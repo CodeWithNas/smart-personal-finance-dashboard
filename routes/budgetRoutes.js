@@ -21,12 +21,12 @@ router.get('/', async (req, res) => {
 // ✅ POST a new budget
 router.post('/', async (req, res) => {
   try {
-    const { category, amount, month } = req.body;
+    const { category, monthlyLimit, month } = req.body;
 
     const budget = new Budget({
       userId: req.user.id,
       category,
-      amount,
+      monthlyLimit,
       month,
     });
 
