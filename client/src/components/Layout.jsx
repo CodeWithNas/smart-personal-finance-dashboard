@@ -1,23 +1,18 @@
 // src/components/Layout.jsx
 import { Outlet, Link } from 'react-router-dom';
+import { useState } from 'react';
 import Navbar from './Navbar';
-import './Layout.css'; // Optional for styling
 
 const Layout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
-    <div className="app-layout" style={{ display: 'flex', height: '100vh' }}>
+    <div className="flex min-h-screen">
       {/* Sidebar */}
       <aside
-        style={{
-          width: '220px',
-          background: '#f4f4f4',
-          padding: '1rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.75rem',
-        }}
+        className={`bg-gray-100 p-4 flex flex-col gap-3 w-56 md:relative md:translate-x-0 md:flex ${sidebarOpen ? 'flex fixed inset-y-0 left-0 z-20' : 'hidden'}`}
       >
-        <h2>SPFD</h2>
+        <h2 className="mb-2 font-semibold">SPFD</h2>
         <Link to="/">Dashboard</Link>
         <Link to="/income">Income</Link>
         <Link to="/expenses">Expenses</Link>
@@ -29,9 +24,9 @@ const Layout = () => {
       </aside>
 
       {/* Main Content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Navbar />
-        <main style={{ padding: '1.5rem', overflowY: 'auto', flex: 1 }}>
+      <div className="flex flex-col flex-1">
+        <Navbar toggleSidebar={() => setSidebarOpen((o) => !o)} />
+        <main className="p-6 overflow-y-auto flex-1">
           <Outlet />
         </main>
       </div>

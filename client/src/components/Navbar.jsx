@@ -1,20 +1,30 @@
 // src/components/Navbar.jsx
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   return (
-    <nav
-      style={{
-        background: '#333',
-        color: '#fff',
-        padding: '1rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-      }}
-    >
-      <div>Welcome to SPFD</div>
+    <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
+      <button
+        className="md:hidden mr-2"
+        onClick={toggleSidebar}
+        aria-label="Toggle menu"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 5.25h16.5m-16.5 7.5h16.5m-16.5 7.5h16.5"
+          />
+        </svg>
+      </button>
+      <div className="flex-1">Welcome to SPFD</div>
       <div>
-        <button style={{ background: '#555', color: '#fff', border: 'none', padding: '0.5rem' }}>
-          Logout
-        </button>
+        <button className="bg-gray-600 text-white border-none p-2">Logout</button>
       </div>
     </nav>
   );
