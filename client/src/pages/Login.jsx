@@ -1,5 +1,6 @@
 // src/pages/Login.jsx
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { TextInput } from '../components/forms';
@@ -12,7 +13,6 @@ const Login = () => {
     password: ''
   });
 
-  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -20,7 +20,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
 
     try {
       const res = await api.post('/auth/login', formData);
@@ -28,7 +27,7 @@ const Login = () => {
       navigate('/dashboard'); // ✅ Redirect
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.error || 'Login failed');
+      toast.error(err.response?.data?.error || 'Login failed');
     }
   };
 
@@ -40,7 +39,6 @@ const Login = () => {
       >
         <h2 className="text-2xl mb-4 font-bold text-center">Login</h2>
 
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <TextInput
           type="email"
