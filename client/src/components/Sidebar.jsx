@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
   return (
-    <aside style={{ width: '220px', background: '#f5f5f5', padding: '1rem' }}>
-      <h2>SPFD</h2>
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+    <aside className="w-56 bg-gray-100 p-4">
+      <h2 className="mb-2 font-semibold">SPFD</h2>
+      <nav className="flex flex-col gap-2">
         <Link to="/">Dashboard</Link>
         <Link to="/income">Income</Link>
         <Link to="/expenses">Expenses</Link>
