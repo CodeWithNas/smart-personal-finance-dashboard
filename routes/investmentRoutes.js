@@ -1,12 +1,13 @@
 import express from 'express';
 import Investment from '../models/Investment.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { validateInvestment, validateInvestmentUpdate } from '../middleware/validation.js';
 
 const router = express.Router();
 router.use(authMiddleware);
 
 // ✅ POST: Add investment
-router.post('/', async (req, res) => {
+router.post('/', validateInvestment, async (req, res) => {
   try {
     const { amount, assetType, institution, date } = req.body;
 
@@ -56,7 +57,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 // ✅ PUT: Update an investment
-router.put('/:id', async (req, res) => {
+router.put('/:id', validateInvestmentUpdate, async (req, res) => {
   try {
     const updated = await Investment.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
