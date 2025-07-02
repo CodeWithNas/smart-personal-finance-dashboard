@@ -45,8 +45,9 @@ Each goal has a `goalName`, `targetAmount`, `currentSaved` and an optional `dead
 
 ## Categorize Endpoint
 
-`POST /api/categorize` accepts a JSON body with an `expenseDescription` string.
-It returns a suggested category using OpenAI or keyword matching.
+`POST /api/categorize` (requires JWT auth) accepts a JSON body with an
+`expenseDescription` string. It returns a suggested category using OpenAI or
+keyword matching.
 
 ```
 {
