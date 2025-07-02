@@ -164,7 +164,7 @@ const Dashboard = () => {
                     {txn.type === 'income' ? '+' : '-'}€{txn.amount}
                   </span>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-700">
                   {new Date(txn.date).toLocaleDateString()}
                 </p>
               </li>

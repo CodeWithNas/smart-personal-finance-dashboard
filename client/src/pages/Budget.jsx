@@ -138,7 +138,7 @@ const Budget = () => {
         </div>
 
         {filtered.length === 0 ? (
-          <p className="text-gray-500">No budget entries found.</p>
+          <p className="text-gray-700">No budget entries found.</p>
         ) : (
           <ul className="space-y-3">
             {filtered.map((b) => (

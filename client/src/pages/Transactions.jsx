@@ -126,8 +126,9 @@ const Transactions = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block mb-1 font-medium">Type</label>
+          <label htmlFor="transactionType" className="block mb-1 font-medium">Type</label>
           <select
+            id="transactionType"
             name="type"
             value={formData.type}
             onChange={handleChange}
@@ -194,8 +195,9 @@ const Transactions = () => {
 
         <div className="flex flex-wrap gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Filter by Month</label>
+            <label htmlFor="txnFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
             <input
+              id="txnFilterMonth"
               type="month"
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
@@ -204,8 +206,9 @@ const Transactions = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Filter by Category</label>
+            <label htmlFor="txnFilterCategory" className="block text-sm font-medium mb-1">Filter by Category</label>
             <select
+              id="txnFilterCategory"
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
               className="border p-2 rounded"
@@ -221,7 +224,7 @@ const Transactions = () => {
         {loading ? (
           <Spinner />
         ) : transactions.length === 0 ? (
-          <p className="text-gray-500">No transactions yet.</p>
+          <p className="text-gray-700">No transactions yet.</p>
         ) : (
           <ul className="space-y-3">
             {transactions

@@ -68,7 +68,7 @@ const Insights = () => {
       <div>
         <h2 className="text-lg font-semibold mb-2">Spending by Category</h2>
         {Object.keys(summary.byCategory).length === 0 ? (
-          <p className="text-gray-500">No expense data yet.</p>
+          <p className="text-gray-700">No expense data yet.</p>
         ) : (
           <ul className="space-y-2">
             {Object.entries(summary.byCategory).map(([category, amount]) => (

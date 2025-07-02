@@ -55,8 +55,9 @@ const Expenses = () => {
 
       <div className="flex flex-wrap gap-4 mb-6">
         <div>
-          <label className="block text-sm font-medium mb-1">Filter by Month</label>
+          <label htmlFor="expensesFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
           <input
+            id="expensesFilterMonth"
             type="month"
             value={filterMonth}
             onChange={(e) => setFilterMonth(e.target.value)}
@@ -77,7 +78,7 @@ const Expenses = () => {
       {loading ? (
         <Spinner />
       ) : filteredExpenses.length === 0 ? (
-        <p className="text-gray-500">No expenses recorded.</p>
+        <p className="text-gray-700">No expenses recorded.</p>
       ) : (
         <ul className="space-y-3">
           {filteredExpenses.map((exp) => (

@@ -147,7 +147,7 @@ const Savings = ({ onChange }) => {
       </form>
 
       {savings.length === 0 ? (
-        <p className="text-gray-500">No savings added yet.</p>
+        <p className="text-gray-700">No savings added yet.</p>
       ) : (
         <>
           <ul className="space-y-4 mb-8">
@@ -160,7 +160,7 @@ const Savings = ({ onChange }) => {
                       {item.goal}{' '}
                       {isComplete && <span className="text-green-600 text-sm">(Completed)</span>}
                     </h3>
-                    <span className="text-sm text-gray-500">{daysLeft(item.dueDate)} days left</span>
+                    <span className="text-sm text-gray-600">{daysLeft(item.dueDate)} days left</span>
                   </div>
 
                   <div className="w-full bg-gray-200 h-3 rounded">
