@@ -1,20 +1,10 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api';
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend,
-  LineChart,
-  Line,
-} from 'recharts';
+  BarChartWidget,
+  PieChartWidget,
+  LineChartWidget,
+} from '../components/charts';
 
 const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#a1e3a1', '#ffd700', '#a1cfff'];
 
@@ -129,75 +119,34 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-gray-100 p-4 rounded">
               <h2 className="text-xl font-semibold mb-3">Income vs Expenses</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={[{ name: 'Totals', income: incomeTotal, expenses: expenseTotal }]}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="income" fill="#82ca9d" />
-                  <Bar dataKey="expenses" fill="#ff7f7f" />
-                </BarChart>
-              </ResponsiveContainer>
+              <BarChartWidget
+                data={[{ name: 'Totals', income: incomeTotal, expenses: expenseTotal }]}
+                xKey="name"
+                bars={[
+                  { dataKey: 'income', fill: '#82ca9d' },
+                  { dataKey: 'expenses', fill: '#ff7f7f' },
+                ]}
+              />
             </div>
 
             <div className="bg-gray-100 p-4 rounded">
               <h2 className="text-xl font-semibold mb-3">Expenses by Category</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label
-                  >
-                    {pieData.map((_, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <PieChartWidget data={pieData} colors={COLORS} outerRadius={80} />
             </div>
 
             <div className="bg-gray-100 p-4 rounded">
               <h2 className="text-xl font-semibold mb-3">Savings by Goal</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <PieChart>
-                  <Pie
-                    data={savingsPieData}
-                    dataKey="value"
-                    nameKey="name"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    label
-                  >
-                    {savingsPieData.map((_, index) => (
-                      <Cell key={index} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
+              <PieChartWidget data={savingsPieData} colors={COLORS} outerRadius={80} />
             </div>
 
             <div className="bg-gray-100 p-4 rounded">
               <h2 className="text-xl font-semibold mb-3">Balance Over Time</h2>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={balanceOverTime}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="balance" stroke="#8884d8" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
+              <LineChartWidget
+                data={balanceOverTime}
+                xKey="date"
+                lineKey="balance"
+                color="#8884d8"
+              />
             </div>
           </div>
 
