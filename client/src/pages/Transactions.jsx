@@ -15,6 +15,8 @@ const Transactions = () => {
   const [editId, setEditId] = useState(null);
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const incomeCategories = ['Salary', 'Freelance', 'Bonus', 'Gift', 'Other'];
   const expenseCategories = ['Food', 'Rent', 'Utilities', 'Entertainment', 'Health', 'Transport', 'Other'];
@@ -29,11 +31,16 @@ const Transactions = () => {
   };
 
   const fetchTransactions = async () => {
+    setLoading(true);
+    setError('');
     try {
       const response = await api.get('/transactions');
       setTransactions(response.data);
     } catch (error) {
       console.error('Error fetching transactions:', error.response?.data || error.message);
+      setError(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,6 +51,7 @@ const Transactions = () => {
       fetchTransactions();
     } catch (error) {
       console.error('Error deleting transaction:', error.response?.data || error.message);
+      setError(error.response?.data?.message || error.message);
     }
   };
 
@@ -90,6 +98,7 @@ const Transactions = () => {
       fetchTransactions();
     } catch (err) {
       console.error('Error submitting transaction:', err.response?.data || err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
 
@@ -102,6 +111,7 @@ const Transactions = () => {
       <h1 className="text-2xl font-bold mb-4">
         {isEditing ? 'Edit Transaction' : 'Add Transaction'}
       </h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -216,7 +226,9 @@ const Transactions = () => {
           </div>
         </div>
 
-        {transactions.length === 0 ? (
+        {loading ? (
+          <p className="text-gray-500">Loading transactions...</p>
+        ) : transactions.length === 0 ? (
           <p className="text-gray-500">No transactions yet.</p>
         ) : (
           <ul className="space-y-3">
