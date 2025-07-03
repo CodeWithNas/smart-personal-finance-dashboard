@@ -74,12 +74,13 @@ const Income = () => {
           }))
         );
 
-        const freq = {};
+        const totals = {};
         data.forEach((tx) => {
-          if (tx.category) freq[tx.category] = (freq[tx.category] || 0) + 1;
+          if (tx.category)
+            totals[tx.category] = (totals[tx.category] || 0) + tx.amount;
         });
         setTopSource(
-          Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+          Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
         );
       } else {
         const months = getPreviousMonths(6, filterMonth);
@@ -107,14 +108,15 @@ const Income = () => {
           }))
         );
 
-        const freq = {};
+        const totals = {};
         Object.values(monthly)
           .flat()
           .forEach((tx) => {
-            if (tx.category) freq[tx.category] = (freq[tx.category] || 0) + 1;
+            if (tx.category)
+              totals[tx.category] = (totals[tx.category] || 0) + tx.amount;
           });
         setTopSource(
-          Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+          Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
         );
       }
     } catch (err) {
