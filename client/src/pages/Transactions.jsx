@@ -24,6 +24,7 @@ const Transactions = () => {
   const [editId, setEditId] = useState(null);
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [filterType, setFilterType] = useState('');
   const [loading, setLoading] = useState(true);
 
 
@@ -119,9 +120,11 @@ const Transactions = () => {
       className="max-w-xl mx-auto bg-white p-6 rounded shadow"
       aria-busy={loading}
     >
-      <h1 className="text-2xl font-bold mb-4">
+      <h1 className="text-3xl font-bold mb-6">Track Income &amp; Expenses</h1>
+
+      <h2 className="text-2xl font-bold mb-4">
         {isEditing ? 'Edit Transaction' : 'Add Transaction'}
-      </h1>
+      </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -218,6 +221,20 @@ const Transactions = () => {
               ))}
             </select>
           </div>
+
+          <div>
+            <label htmlFor="txnFilterType" className="block text-sm font-medium mb-1">Filter by Type</label>
+            <select
+              id="txnFilterType"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="border p-2 rounded"
+            >
+              <option value="">All</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
         </div>
 
         {loading ? (
@@ -231,7 +248,8 @@ const Transactions = () => {
                 const txnMonth = txn.date?.slice(0, 7);
                 return (
                   (filterMonth === '' || txnMonth === filterMonth) &&
-                  (filterCategory === '' || txn.category === filterCategory)
+                  (filterCategory === '' || txn.category === filterCategory) &&
+                  (filterType === '' || txn.type === filterType)
                 );
               })
               .map((txn) => (

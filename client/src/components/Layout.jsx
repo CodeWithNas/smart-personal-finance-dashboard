@@ -19,6 +19,7 @@ const Layout = () => {
       >
         <h2 className="mb-2 font-semibold">SPFD</h2>
         <Link to="/">Dashboard</Link>
+        <Link to="/transactions">Transactions</Link>
         <Link to="/income">Income</Link>
         <Link to="/expenses">Expenses</Link>
         <Link to="/budget">Budget</Link>
@@ -39,6 +40,13 @@ const Layout = () => {
         <Navbar toggleSidebar={() => setSidebarOpen((o) => !o)} />
         <main className="p-6 overflow-y-auto flex-1">
           <Outlet />
+          <Link
+            to="/transactions"
+            className="fixed bottom-6 right-6 bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg hover:bg-blue-700"
+            aria-label="Add transaction"
+          >
+            +
+          </Link>
         </main>
       </div>
     </div>
