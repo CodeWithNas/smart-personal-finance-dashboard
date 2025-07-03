@@ -44,35 +44,71 @@ const Income = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const months = getPreviousMonths(6, filterMonth);
-      const responses = await Promise.all(
-        months.map((m) => api.get(`/transactions?type=income&month=${m}`))
-      );
-      const monthly = {};
-      responses.forEach((res, idx) => {
-        monthly[months[idx]] = res.data;
-      });
-      setIncomes(monthly[filterMonth] || []);
-      const prev = getPreviousMonths(2, filterMonth)[0];
-      const prevData = monthly[prev] || [];
-      setPrevMonthTotal(prevData.reduce((s, t) => s + t.amount, 0));
+      if (!filterMonth) {
+        const res = await api.get('/transactions?type=income');
+        const data = res.data || [];
+        setIncomes(data);
 
-      setTrendData(
-        months.map((m) => ({
-          month: m,
-          total: (monthly[m] || []).reduce((sum, t) => sum + t.amount, 0),
-        }))
-      );
+        const months = getPreviousMonths(6);
+        const monthly = {};
+        months.forEach((m) => {
+          monthly[m] = [];
+        });
+        data.forEach((tx) => {
+          const m = tx.date?.slice(0, 7);
+          if (!monthly[m]) monthly[m] = [];
+          monthly[m].push(tx);
+        });
 
-      const freq = {};
-      Object.values(monthly)
-        .flat()
-        .forEach((tx) => {
+        const prev = getPreviousMonths(2)[0];
+        const prevData = monthly[prev] || [];
+        setPrevMonthTotal(prevData.reduce((s, t) => s + t.amount, 0));
+
+        setTrendData(
+          months.map((m) => ({
+            month: m,
+            total: (monthly[m] || []).reduce((sum, t) => sum + t.amount, 0),
+          }))
+        );
+
+        const freq = {};
+        data.forEach((tx) => {
           if (tx.category) freq[tx.category] = (freq[tx.category] || 0) + 1;
         });
-      setTopSource(
-        Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
-      );
+        setTopSource(
+          Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+        );
+      } else {
+        const months = getPreviousMonths(6, filterMonth);
+        const responses = await Promise.all(
+          months.map((m) => api.get(`/transactions?type=income&month=${m}`))
+        );
+        const monthly = {};
+        responses.forEach((res, idx) => {
+          monthly[months[idx]] = res.data;
+        });
+        setIncomes(monthly[filterMonth] || []);
+        const prev = getPreviousMonths(2, filterMonth)[0];
+        const prevData = monthly[prev] || [];
+        setPrevMonthTotal(prevData.reduce((s, t) => s + t.amount, 0));
+
+        setTrendData(
+          months.map((m) => ({
+            month: m,
+            total: (monthly[m] || []).reduce((sum, t) => sum + t.amount, 0),
+          }))
+        );
+
+        const freq = {};
+        Object.values(monthly)
+          .flat()
+          .forEach((tx) => {
+            if (tx.category) freq[tx.category] = (freq[tx.category] || 0) + 1;
+          });
+        setTopSource(
+          Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+        );
+      }
     } catch (err) {
       console.error('Error loading income data:', err.response?.data || err.message);
       toast.error(err.response?.data?.message || err.message);
