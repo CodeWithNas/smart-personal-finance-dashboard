@@ -1,7 +1,7 @@
 // src/pages/Login.jsx
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { TextInput } from '../components/forms';
 
@@ -69,6 +69,12 @@ const Login = () => {
           Login
         </button>
       </form>
+      <p className="mt-4 text-center text-sm">
+        Don't have an account?{' '}
+        <Link to="/register" className="text-blue-600 underline">
+          Register here
+        </Link>
+      </p>
     </div>
   );
 };
