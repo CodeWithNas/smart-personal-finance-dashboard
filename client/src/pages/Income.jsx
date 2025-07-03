@@ -155,19 +155,23 @@ const Income = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-4" aria-busy={loading}>
-      <h1 className="text-2xl font-bold mb-4">Income Overview &amp; Insights</h1>
+      {loading ? (
+        <Spinner />
+      ) : (
+        <>
+          <h1 className="text-2xl font-bold mb-4">Income Overview &amp; Insights</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-green-100 p-4 rounded">
-          <p className="text-sm text-gray-600">Total Income</p>
-          <p className="text-2xl font-bold text-green-700">€{totalIncome.toFixed(2)}</p>
-          {changePct !== null && (
-            <p className={changePct >= 0 ? 'text-green-600' : 'text-red-600'}>
-              {changePct >= 0 ? '+' : ''}
-              {changePct.toFixed(1)}% vs prev month
-            </p>
-          )}
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <div className="bg-green-100 p-4 rounded">
+              <p className="text-sm text-gray-600">Total Income</p>
+              <p className="text-2xl font-bold text-green-700">€{totalIncome.toFixed(2)}</p>
+              {changePct !== null && (
+                <p className={changePct >= 0 ? 'text-green-600' : 'text-red-600'}>
+                  {changePct >= 0 ? '+' : ''}
+                  {changePct.toFixed(1)}% vs prev month
+                </p>
+              )}
+            </div>
         <div className="bg-blue-100 p-4 rounded">
           <p className="text-sm text-gray-600">Top Source</p>
           <p className="text-lg font-semibold">{topSource || '—'}</p>
@@ -239,37 +243,37 @@ const Income = () => {
         </div>
       </div>
 
-      <div className="bg-white p-4 rounded shadow">
-        <h2 className="text-lg font-semibold mb-2">Recent Entries</h2>
-        {loading ? (
-          <Spinner />
-        ) : incomes.length === 0 || latestEntries.length === 0 ? (
-          <p className="text-gray-700">No income data found.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left text-sm">
-              <thead>
-                <tr>
-                  <th className="py-2 px-1">Date</th>
-                  <th className="py-2 px-1">Amount</th>
-                  <th className="py-2 px-1">Category</th>
-                  <th className="py-2 px-1">Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {latestEntries.map((inc) => (
-                  <tr key={inc._id} className="border-t">
-                    <td className="py-2 px-1 whitespace-nowrap">{formatDate(inc.date)}</td>
-                    <td className="py-2 px-1">€{inc.amount}</td>
-                    <td className="py-2 px-1">{inc.category}</td>
-                    <td className="py-2 px-1">{inc.description || '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="bg-white p-4 rounded shadow">
+            <h2 className="text-lg font-semibold mb-2">Recent Entries</h2>
+            {incomes.length === 0 || latestEntries.length === 0 ? (
+              <p className="text-gray-700">No income data found.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead>
+                    <tr>
+                      <th className="py-2 px-1">Date</th>
+                      <th className="py-2 px-1">Amount</th>
+                      <th className="py-2 px-1">Category</th>
+                      <th className="py-2 px-1">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {latestEntries.map((inc) => (
+                      <tr key={inc._id} className="border-t">
+                        <td className="py-2 px-1 whitespace-nowrap">{formatDate(inc.date)}</td>
+                        <td className="py-2 px-1">€{inc.amount}</td>
+                        <td className="py-2 px-1">{inc.category}</td>
+                        <td className="py-2 px-1">{inc.description || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
