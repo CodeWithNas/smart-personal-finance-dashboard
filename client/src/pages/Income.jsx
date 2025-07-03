@@ -1,204 +1,227 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
-import {
-  TextInput,
-  NumberInput,
-  DateInput,
-  CategorySelect,
-} from '../components/forms';
+import { CategorySelect, NumberInput } from '../components/forms';
+import { PieChartWidget, LineChartWidget } from '../components/charts';
 import { Spinner } from '../components/loading';
 import { incomeCategories, formatDate } from '../utils';
 
+const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#a1e3a1', '#ffd700'];
+
+const getPreviousMonths = (count, base) => {
+  const months = [];
+  const d = base ? new Date(base + '-01') : new Date();
+  for (let i = count - 1; i >= 0; i--) {
+    const m = new Date(d.getFullYear(), d.getMonth() - i, 1)
+      .toISOString()
+      .slice(0, 7);
+    months.push(m);
+  }
+  return months;
+};
+
 const Income = () => {
-  const [incomes, setIncomes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    type: 'income',
-    amount: '',
-    category: '',
-    date: '',
-    description: '',
-  });
+  const [incomes, setIncomes] = useState([]);
+  const [trendData, setTrendData] = useState([]);
+  const [topSource, setTopSource] = useState('');
+  const [prevMonthTotal, setPrevMonthTotal] = useState(0);
 
-  const [filterMonth, setFilterMonth] = useState('');
+  const [filterMonth, setFilterMonth] = useState(() =>
+    new Date().toISOString().slice(0, 7)
+  );
   const [filterCategory, setFilterCategory] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+  const [notes, setNotes] = useState(() => localStorage.getItem('incomeNotes') || '');
 
+  const handleNoteChange = (e) => {
+    const val = e.target.value;
+    setNotes(val);
+    localStorage.setItem('incomeNotes', val);
+  };
 
-  const fetchIncomes = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/transactions');
-      const onlyIncomes = res.data.filter((txn) => txn.type === 'income');
-      setIncomes(onlyIncomes);
+      const months = getPreviousMonths(6, filterMonth);
+      const responses = await Promise.all(
+        months.map((m) => api.get(`/transactions?type=income&month=${m}`))
+      );
+      const monthly = {};
+      responses.forEach((res, idx) => {
+        monthly[months[idx]] = res.data;
+      });
+      setIncomes(monthly[filterMonth] || []);
+      const prev = getPreviousMonths(2, filterMonth)[0];
+      const prevData = monthly[prev] || [];
+      setPrevMonthTotal(prevData.reduce((s, t) => s + t.amount, 0));
+
+      setTrendData(
+        months.map((m) => ({
+          month: m,
+          total: (monthly[m] || []).reduce((sum, t) => sum + t.amount, 0),
+        }))
+      );
+
+      const freq = {};
+      Object.values(monthly)
+        .flat()
+        .forEach((tx) => {
+          if (tx.category) freq[tx.category] = (freq[tx.category] || 0) + 1;
+        });
+      setTopSource(
+        Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || ''
+      );
     } catch (err) {
-      console.error('Error fetching incomes:', err.response?.data || err.message);
+      console.error('Error loading income data:', err.response?.data || err.message);
       toast.error(err.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  useEffect(() => {
+    fetchData();
+  }, [filterMonth]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const payload = { ...formData, type: 'income' };
-
-    try {
-      await api.post('/transactions', payload);
-      setFormData({
-        type: 'income',
-        amount: '',
-        category: '',
-        date: '',
-        description: '',
-      });
-      fetchIncomes();
-      toast.success('Income saved');
-    } catch (err) {
-      console.error('Error saving income:', err.response?.data || err.message);
-      toast.error(err.response?.data?.message || err.message);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this income?')) return;
-    try {
-      await api.delete(`/transactions/${id}`);
-      fetchIncomes();
-      toast.success('Income deleted');
-    } catch (err) {
-      console.error('Error deleting income:', err.response?.data || err.message);
-      toast.error(err.response?.data?.message || err.message);
-    }
-  };
-
-  const filtered = incomes.filter((txn) => {
-    const txnMonth = txn.date?.slice(0, 7);
-    return (
-      (filterMonth === '' || txnMonth === filterMonth) &&
-      (filterCategory === '' || txn.category === filterCategory)
-    );
+  const filtered = incomes.filter((inc) => {
+    const cat = !filterCategory || inc.category === filterCategory;
+    const min = !minAmount || inc.amount >= parseFloat(minAmount);
+    const max = !maxAmount || inc.amount <= parseFloat(maxAmount);
+    return cat && min && max;
   });
 
-  useEffect(() => {
-    fetchIncomes();
-  }, []);
+  const totalIncome = filtered.reduce((sum, t) => sum + t.amount, 0);
+  const changePct =
+    prevMonthTotal > 0 ? ((totalIncome - prevMonthTotal) / prevMonthTotal) * 100 : null;
+
+  const byCategory = {};
+  filtered.forEach((txn) => {
+    const cat = txn.category || 'Other';
+    byCategory[cat] = (byCategory[cat] || 0) + txn.amount;
+  });
+  const pieData = Object.entries(byCategory).map(([name, value]) => ({ name, value }));
+
+  const latestEntries = [...filtered]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 10);
 
   return (
-    <div
-      className="max-w-2xl mx-auto bg-white p-6 rounded shadow"
-      aria-busy={loading}
-    >
-      <h1 className="text-2xl font-bold mb-4">Income Tracker</h1>
+    <div className="max-w-6xl mx-auto p-4" aria-busy={loading}>
+      <h1 className="text-2xl font-bold mb-4">Income Overview &amp; Insights</h1>
 
-      {/* Income Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <NumberInput
-          label="Amount (€)"
-          name="amount"
-          value={formData.amount}
-          onChange={handleChange}
-          required
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div className="bg-green-100 p-4 rounded">
+          <p className="text-sm text-gray-600">Total Income</p>
+          <p className="text-2xl font-bold text-green-700">€{totalIncome.toFixed(2)}</p>
+          {changePct !== null && (
+            <p className={changePct >= 0 ? 'text-green-600' : 'text-red-600'}>
+              {changePct >= 0 ? '+' : ''}
+              {changePct.toFixed(1)}% vs prev month
+            </p>
+          )}
+        </div>
+        <div className="bg-blue-100 p-4 rounded">
+          <p className="text-sm text-gray-600">Top Source</p>
+          <p className="text-lg font-semibold">{topSource || '—'}</p>
+        </div>
+        <div className="bg-gray-100 p-4 rounded">
+          <p className="text-sm text-gray-600 mb-1">Notes</p>
+          <textarea
+            value={notes}
+            onChange={handleNoteChange}
+            className="w-full border p-2 rounded h-24 resize-none"
+          />
+        </div>
+      </div>
 
-        <CategorySelect
-          label="Category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          options={incomeCategories}
-          required
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="bg-gray-100 p-4 rounded">
+          <h2 className="text-lg font-semibold mb-2">Income by Category</h2>
+          {pieData.length === 0 ? (
+            <p className="text-gray-700">No data</p>
+          ) : (
+            <PieChartWidget data={pieData} colors={COLORS} outerRadius={80} />
+          )}
+        </div>
+        <div className="bg-gray-100 p-4 rounded">
+          <h2 className="text-lg font-semibold mb-2">Monthly Trend</h2>
+          {trendData.length === 0 ? (
+            <p className="text-gray-700">No data</p>
+          ) : (
+            <LineChartWidget data={trendData} xKey="month" lineKey="total" color="#8884d8" />
+          )}
+        </div>
+      </div>
 
-        <DateInput
-          label="Date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-        />
-
-        <TextInput
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="e.g. Bonus or payment note"
-        />
-
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-        >
-          Save Income
-        </button>
-      </form>
-
-      {/* Filter & Income List */}
-      <div className="mt-10">
-        <h2 className="text-xl font-semibold mb-3">Recent Income</h2>
-
-        <div className="flex flex-wrap gap-4 mb-4">
+      <div className="bg-white p-4 rounded shadow mb-4">
+        <h2 className="text-lg font-semibold mb-3">Filters</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <label htmlFor="incomeFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
+            <label htmlFor="filterMonth" className="block text-sm font-medium mb-1">
+              Month
+            </label>
             <input
-              id="incomeFilterMonth"
+              id="filterMonth"
               type="month"
               value={filterMonth}
               onChange={(e) => setFilterMonth(e.target.value)}
-              className="border p-2 rounded"
+              className="border p-2 rounded w-full"
             />
           </div>
-
-          <div>
-            <label htmlFor="incomeFilterCategory" className="block text-sm font-medium mb-1">Filter by Category</label>
-            <select
-              id="incomeFilterCategory"
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="border p-2 rounded"
-            >
-              <option value="">All</option>
-              {incomeCategories.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
+          <CategorySelect
+            label="Category"
+            name="filterCategory"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            options={incomeCategories}
+            placeholder="All"
+          />
+          <NumberInput
+            label="Min Amount"
+            name="minAmount"
+            value={minAmount}
+            onChange={(e) => setMinAmount(e.target.value)}
+          />
+          <NumberInput
+            label="Max Amount"
+            name="maxAmount"
+            value={maxAmount}
+            onChange={(e) => setMaxAmount(e.target.value)}
+          />
         </div>
+      </div>
 
+      <div className="bg-white p-4 rounded shadow">
+        <h2 className="text-lg font-semibold mb-2">Recent Entries</h2>
         {loading ? (
           <Spinner />
-        ) : filtered.length === 0 ? (
-          <p className="text-gray-700">No income added yet.</p>
+        ) : latestEntries.length === 0 ? (
+          <p className="text-gray-700">No income data found.</p>
         ) : (
-          <ul className="space-y-3">
-            {filtered.map((item) => (
-              <li key={item._id} className="border p-4 rounded shadow-sm relative">
-                <div className="flex justify-between">
-                  <div>
-                    <div className="font-medium">{item.category}</div>
-                    <div className="text-sm text-gray-600">
-                      {formatDate(item.date)} – {item.description || '—'}
-                    </div>
-                  </div>
-                  <div className="text-green-600 font-semibold">€{item.amount}</div>
-                </div>
-                <button
-                  onClick={() => handleDelete(item._id)}
-                  className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
-                >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm">
+              <thead>
+                <tr>
+                  <th className="py-2 px-1">Date</th>
+                  <th className="py-2 px-1">Amount</th>
+                  <th className="py-2 px-1">Category</th>
+                  <th className="py-2 px-1">Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                {latestEntries.map((inc) => (
+                  <tr key={inc._id} className="border-t">
+                    <td className="py-2 px-1 whitespace-nowrap">{formatDate(inc.date)}</td>
+                    <td className="py-2 px-1">€{inc.amount}</td>
+                    <td className="py-2 px-1">{inc.category}</td>
+                    <td className="py-2 px-1">{inc.description || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>
