@@ -30,6 +30,8 @@ const Transactions = () => {
   const [filterType, setFilterType] = useState('');
   const [filterRecurring, setFilterRecurring] = useState('');
   const [loading, setLoading] = useState(true);
+  const [totals, setTotals] = useState({ income: 0, expenses: 0, net: 0 });
+  const [totalsLoading, setTotalsLoading] = useState(false);
 
 
   const dynamicCategories =
@@ -40,6 +42,21 @@ const Transactions = () => {
     formData.amount &&
     formData.category &&
     formData.date;
+
+  const filterTransactions = (txns) =>
+    txns.filter((txn) => {
+      const txnMonth = txn.date?.slice(0, 7);
+      const recMatch =
+        filterRecurring === '' ||
+        (filterRecurring === 'recurring' && txn.recurring) ||
+        (filterRecurring === 'one-time' && !txn.recurring);
+      return (
+        (filterMonth === '' || txnMonth === filterMonth) &&
+        (filterCategory === '' || txn.category === filterCategory) &&
+        (filterType === '' || txn.type === filterType) &&
+        recMatch
+      );
+    });
 
   const handleChange = (e) => {
     const value =
@@ -138,6 +155,24 @@ const Transactions = () => {
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+  useEffect(() => {
+    setTotalsLoading(true);
+    const filtered = filterTransactions(transactions);
+    let incomeTotal = 0;
+    let expenseTotal = 0;
+    filtered.forEach((txn) => {
+      if (txn.type === 'income') {
+        incomeTotal += txn.amount;
+      } else {
+        expenseTotal += txn.amount;
+      }
+    });
+    setTotals({ income: incomeTotal, expenses: expenseTotal, net: incomeTotal - expenseTotal });
+    setTotalsLoading(false);
+  }, [transactions, filterMonth, filterCategory, filterType, filterRecurring]);
+
+  const filteredTransactions = filterTransactions(transactions);
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8" aria-busy={loading}>
@@ -254,6 +289,14 @@ const Transactions = () => {
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-3">Recent Transactions</h2>
 
+        {totalsLoading ? (
+          <Spinner />
+        ) : (
+          <div className="bg-green-100 p-4 rounded text-lg mb-4">
+            💰 Total Income: €{totals.income.toFixed(2)} | 💸 Total Expenses: €{totals.expenses.toFixed(2)} | 🧮 Net: €{totals.net.toFixed(2)}
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-4 mb-4 items-end">
           <div>
             <label htmlFor="txnFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
@@ -320,32 +363,18 @@ const Transactions = () => {
 
         {loading ? (
           <Spinner />
-        ) : transactions.length === 0 ? (
+        ) : filteredTransactions.length === 0 ? (
           <p className="text-gray-700">No transactions yet.</p>
         ) : (
           <ul className="space-y-3">
-            {transactions
-              .filter((txn) => {
-                const txnMonth = txn.date?.slice(0, 7);
-                const recMatch =
-                  filterRecurring === '' ||
-                  (filterRecurring === 'recurring' && txn.recurring) ||
-                  (filterRecurring === 'one-time' && !txn.recurring);
-                return (
-                  (filterMonth === '' || txnMonth === filterMonth) &&
-                  (filterCategory === '' || txn.category === filterCategory) &&
-                  (filterType === '' || txn.type === filterType) &&
-                  recMatch
-                );
-              })
-              .map((txn) => (
-                <TransactionItem
-                  key={txn._id}
-                  transaction={txn}
-                  onDelete={handleDelete}
-                  onUpdate={fetchTransactions}
-                />
-              ))}
+            {filteredTransactions.map((txn) => (
+              <TransactionItem
+                key={txn._id}
+                transaction={txn}
+                onDelete={handleDelete}
+                onUpdate={fetchTransactions}
+              />
+            ))}
           </ul>
         )}
       </div>
