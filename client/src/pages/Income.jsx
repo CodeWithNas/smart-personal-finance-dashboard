@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import { CategorySelect, NumberInput } from '../components/forms';
-import { PieChartWidget, LineChartWidget } from '../components/charts';
+import { PieChartWidget, LineChartWidget, ChartPlaceholder } from '../components/charts';
 import { Spinner } from '../components/loading';
 import { incomeCategories, formatDate } from '../utils';
 
@@ -186,7 +186,7 @@ const Income = () => {
         <div className="bg-gray-100 p-4 rounded">
           <h2 className="text-lg font-semibold mb-2">Income by Category</h2>
           {pieData.length === 0 ? (
-            <p className="text-gray-700">No data</p>
+            <ChartPlaceholder height={200} />
           ) : (
             <PieChartWidget data={pieData} colors={COLORS} outerRadius={80} />
           )}
