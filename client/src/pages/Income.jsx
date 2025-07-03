@@ -45,9 +45,11 @@ const Income = () => {
     setLoading(true);
     try {
       if (!filterMonth) {
-        const res = await api.get('/transactions?type=income');
+        const res = await api.get(
+          `/transactions?type=income&month=${filterMonth}&category=${filterCategory}&min=${minAmount}&max=${maxAmount}`
+        );
         const data = res.data || [];
-        console.log('Fetched income data:', data);
+        console.log('Fetched income data with filters:', data);
         setIncomes(data);
 
         const months = getPreviousMonths(6);
@@ -82,9 +84,13 @@ const Income = () => {
       } else {
         const months = getPreviousMonths(6, filterMonth);
         const responses = await Promise.all(
-          months.map((m) => api.get(`/transactions?type=income&month=${m}`))
+          months.map((m) =>
+            api.get(
+              `/transactions?type=income&month=${m}&category=${filterCategory}&min=${minAmount}&max=${maxAmount}`
+            )
+          )
         );
-        console.log('Fetched income data:', responses.map((r) => r.data));
+        console.log('Fetched income data with filters:', responses.map((r) => r.data));
         const monthly = {};
         responses.forEach((res, idx) => {
           monthly[months[idx]] = res.data;
@@ -121,7 +127,7 @@ const Income = () => {
 
   useEffect(() => {
     fetchData();
-  }, [filterMonth]);
+  }, [filterMonth, filterCategory, minAmount, maxAmount]);
 
   const filtered = incomes.filter((inc) => {
     const cat = !filterCategory || inc.category === filterCategory;
