@@ -149,9 +149,10 @@ const Income = () => {
   });
   const pieData = Object.entries(byCategory).map(([name, value]) => ({ name, value }));
 
+  const entriesToShow = Math.min(Math.max(filtered.length, 5), 10);
   const latestEntries = [...filtered]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 10);
+    .slice(0, entriesToShow);
 
   return (
     <div className="max-w-6xl mx-auto p-4" aria-busy={loading}>
