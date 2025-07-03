@@ -67,6 +67,13 @@ A full‑stack application to track income, expenses, savings and investments. T
 - `PUT /api/transactions/:id` – update transaction
 - `DELETE /api/transactions/:id` – delete transaction
 
+`POST` and `PUT` requests accept these fields:
+
+- `recurring` (boolean) – set to `true` for repeating expenses or income
+- `frequency` (string) – one of `monthly`, `quarterly`, `yearly` (defaults to `monthly`)
+
+Recurring entries are stored for future use. Automation not yet implemented.
+
 ### Income & Expenses
 - `GET /api/income` / `POST /api/income`
 - `GET /api/expenses` / `POST /api/expenses`
