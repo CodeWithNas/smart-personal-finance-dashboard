@@ -62,7 +62,7 @@ A full‑stack application to track income, expenses, savings and investments. T
 - `POST /api/auth/login` – authenticate user (sets JWT cookie)
 
 ### Transactions
-- `GET /api/transactions` – list all transactions
+- `GET /api/transactions` – list all transactions (query: `type`, `month`, `category`, `min`, `max`)
 - `POST /api/transactions` – create a transaction
 - `PUT /api/transactions/:id` – update transaction
 - `DELETE /api/transactions/:id` – delete transaction

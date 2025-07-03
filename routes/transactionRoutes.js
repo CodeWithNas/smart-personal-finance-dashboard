@@ -11,11 +11,15 @@ router.use(authMiddleware);
 // ✅ GET all transactions for the logged-in user
 router.get('/', async (req, res) => {
   try {
-    const { type, month } = req.query;
+    const { type, month, category, min, max } = req.query;
     const filter = { userId: req.user.id };
 
     if (type) {
       filter.type = type.toLowerCase();
+    }
+
+    if (category) {
+      filter.category = category;
     }
 
     if (month) {
@@ -25,6 +29,16 @@ router.get('/', async (req, res) => {
       const start = new Date(year, monthIdx, 1);
       const end = new Date(year, monthIdx + 1, 1);
       filter.date = { $gte: start, $lt: end };
+    }
+
+    if (min || max) {
+      filter.amount = {};
+      if (min) {
+        filter.amount.$gte = parseFloat(min);
+      }
+      if (max) {
+        filter.amount.$lte = parseFloat(max);
+      }
     }
 
     const transactions = await Transaction.find(filter).sort({ date: -1 });
