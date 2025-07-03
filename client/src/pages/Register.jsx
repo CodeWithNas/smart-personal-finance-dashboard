@@ -1,6 +1,6 @@
 // src/pages/Register.jsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from '../services/api'; // Make sure this points to your axios setup
 import { TextInput } from '../components/forms';
 import { toast } from 'react-hot-toast';
@@ -55,6 +55,12 @@ const Register = () => {
           Register
         </button>
       </form>
+      <p className="mt-4 text-center text-sm">
+        Already have an account?{' '}
+        <Link to="/login" className="text-blue-600 underline">
+          Log in here
+        </Link>
+      </p>
     </div>
   );
 };
