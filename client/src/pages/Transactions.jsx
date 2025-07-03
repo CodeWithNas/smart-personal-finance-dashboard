@@ -8,17 +8,8 @@ import {
   CategorySelect,
 } from '../components/forms';
 import { Spinner } from '../components/loading';
-import { incomeCategories, expenseCategories, formatDate } from '../utils';
-
-const formatLongDate = (input) => {
-  const d = new Date(input);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-};
+import { incomeCategories, expenseCategories } from '../utils';
+import TransactionItem from '../components/TransactionItem';
 
 const Transactions = () => {
   const [formData, setFormData] = useState({
@@ -347,54 +338,14 @@ const Transactions = () => {
                   recMatch
                 );
               })
-              .map((txn) => {
-                const truncated =
-                  txn.description && txn.description.length > 30
-                    ? `${txn.description.slice(0, 30)}...`
-                    : txn.description;
-                return (
-                  <li
-                    key={txn._id}
-                    className="border rounded-lg p-4 shadow-sm relative"
-                  >
-                    <div className="flex justify-between">
-                      <span className="font-medium">
-                        {txn.category} ({txn.type})
-                      </span>
-                      <span
-                        className={
-                          txn.type === 'income' ? 'text-green-600' : 'text-red-600'
-                        }
-                      >
-                        €{txn.amount}
-                      </span>
-                    </div>
-                  <div className="text-sm text-gray-600">
-                    {formatLongDate(txn.date)} -{' '}
-                    <span title={txn.description}>{truncated}</span>
-                    {txn.recurring && (
-                      <span className="ml-2 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
-                        🔁 Recurring
-                      </span>
-                    )}
-                  </div>
-                    <button
-                      onClick={() => handleEdit(txn)}
-                      title="Edit"
-                      className="absolute top-2 right-16 text-blue-500 hover:text-blue-700 text-sm"
-                    >
-                      🖉
-                    </button>
-                    <button
-                      onClick={() => handleDelete(txn._id)}
-                      title="Delete"
-                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
-                    >
-                      🗑
-                    </button>
-                  </li>
-                );
-              })}
+              .map((txn) => (
+                <TransactionItem
+                  key={txn._id}
+                  transaction={txn}
+                  onDelete={handleDelete}
+                  onUpdate={fetchTransactions}
+                />
+              ))}
           </ul>
         )}
       </div>
