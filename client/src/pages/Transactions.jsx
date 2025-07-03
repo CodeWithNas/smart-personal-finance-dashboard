@@ -152,6 +152,20 @@ const Transactions = () => {
     setFilterRecurring('');
   };
 
+  const applyRecurringExpenses = async () => {
+    try {
+      const res = await api.post('/transactions/recurring/apply');
+      toast.success(`Applied ${res.data.created} recurring transactions`);
+      fetchTransactions();
+    } catch (error) {
+      console.error(
+        'Error applying recurring transactions:',
+        error.response?.data || error.message
+      );
+      toast.error(error.response?.data?.error || error.message);
+    }
+  };
+
   useEffect(() => {
     fetchTransactions();
   }, []);
@@ -358,6 +372,13 @@ const Transactions = () => {
             className="ml-auto bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
           >
             Clear Filters
+          </button>
+          <button
+            type="button"
+            onClick={applyRecurringExpenses}
+            className="bg-purple-500 text-white px-3 py-2 rounded hover:bg-purple-600"
+          >
+            Apply Recurring Expenses
           </button>
         </div>
 

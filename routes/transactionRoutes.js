@@ -103,4 +103,77 @@ router.put('/:id', validateTransactionUpdate, async (req, res) => {
   }
 });
 
+// ✅ PATCH (Partial Update) a transaction owned by the logged-in user
+router.patch('/:id', validateTransactionUpdate, async (req, res) => {
+  try {
+    const updated = await Transaction.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Transaction not found or unauthorized' });
+    }
+
+    res.json(updated);
+  } catch (err) {
+    console.error('PATCH /transactions/:id error:', err);
+    res.status(500).json({ error: 'Failed to update transaction' });
+  }
+});
+
+// TODO: Recurring Expense Automation Logic
+router.post('/recurring/apply', async (req, res) => {
+  try {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const prevMonthStart = new Date(currentYear, currentMonth - 1, 1);
+    const prevMonthEnd = new Date(currentYear, currentMonth, 1);
+
+    const recurringTxns = await Transaction.find({
+      userId: req.user.id,
+      recurring: true,
+      date: { $gte: prevMonthStart, $lt: prevMonthEnd },
+    });
+
+    let created = 0;
+
+    for (const tx of recurringTxns) {
+      const newDate = new Date(currentYear, currentMonth, tx.date.getDate());
+      const start = new Date(newDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(newDate);
+      end.setHours(23, 59, 59, 999);
+
+      const exists = await Transaction.findOne({
+        userId: req.user.id,
+        category: tx.category,
+        date: { $gte: start, $lte: end },
+      });
+
+      if (exists) continue;
+
+      await Transaction.create({
+        userId: req.user.id,
+        type: tx.type,
+        vendor: tx.vendor,
+        amount: tx.amount,
+        category: tx.category,
+        date: newDate,
+        recurring: tx.recurring,
+        frequency: tx.frequency,
+        description: tx.description,
+      });
+      created++;
+    }
+
+    res.json({ created });
+  } catch (err) {
+    console.error('POST /transactions/recurring/apply error:', err);
+    res.status(500).json({ error: 'Failed to apply recurring transactions' });
+  }
+});
+
 export default router;
