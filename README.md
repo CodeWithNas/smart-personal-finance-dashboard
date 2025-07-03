@@ -1,66 +1,150 @@
 # Smart Personal Finance Dashboard
 
-This project is a simple Node.js backend that provides API endpoints for managing personal finances.
+A full‑stack application to track income, expenses, savings and investments. The project consists of a Node.js/Express API with MongoDB and a React dashboard built with Vite and Tailwind CSS.
 
-## Upload Endpoint
+## Tech Stack
 
-`POST /api/upload` accepts a CSV file (`multipart/form-data` under the `file` field) containing transactions. Valid rows are stored in the database and recurring transactions are detected automatically.
+### Backend
+- **Node.js** + **Express**
+- **MongoDB** with **Mongoose**
+- **JWT** authentication stored in HTTP cookies
+- **Multer** for CSV uploads
+- **OpenAI** API for expense categorization
+- **dotenv**, **cors**, **cookie-parser**
 
-CSV columns supported: `date`, `vendor`, `amount`, `category`.
+### Frontend
+- **React** with **Vite**
+- **Tailwind CSS**
+- **Recharts** for charts
+- **React Router**
+- **React Hot Toast** for notifications
 
-Response example:
+### Tools
+- PostCSS
+- ESLint/Prettier (if configured)
 
-```
-{ "inserted": 12 }
-```
+## Setup
 
-## Savings Goals
+### Backend
+1. Copy `.env.example` to `.env` and fill in your credentials.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the server:
+   ```bash
+   node server.js
+   ```
 
-The API exposes CRUD routes for managing savings goals:
+### Frontend
+1. Install dependencies inside `client`:
+   ```bash
+   cd client && npm install
+   ```
+2. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
-- `POST /api/goals`
+## Environment Variables
+| Variable | Description |
+|----------|-------------|
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Secret for JWT signing |
+| `CLIENT_URL` | Frontend URL (used for CORS) |
+| `OPENAI_API_KEY` | API key for OpenAI categorization |
+| `PORT` | Server port (default 3000) |
+
+## API Endpoints
+
+### Auth
+- `POST /api/auth/register` – create a new user (sets JWT cookie)
+- `POST /api/auth/login` – authenticate user (sets JWT cookie)
+
+### Transactions
+- `GET /api/transactions` – list all transactions
+- `POST /api/transactions` – create a transaction
+- `PUT /api/transactions/:id` – update transaction
+- `DELETE /api/transactions/:id` – delete transaction
+
+### Income & Expenses
+- `GET /api/income` / `POST /api/income`
+- `GET /api/expenses` / `POST /api/expenses`
+
+### Savings
+- `POST /api/savings` – create saving goal
+- `POST /api/savings/:id/contribute` – add contribution
+- `GET /api/savings` – list savings
+- `PUT /api/savings/:id` – update goal
+- `DELETE /api/savings/:id` – delete goal
+
+### Investments
+- `GET /api/investments`
+- `POST /api/investments`
+- `PUT /api/investments/:id`
+- `DELETE /api/investments/:id`
+
+### Goals
 - `GET /api/goals`
+- `POST /api/goals`
 - `PUT /api/goals/:id`
 - `DELETE /api/goals/:id`
 
-Each goal has a `goalName`, `targetAmount`, `currentSaved` and an optional `deadline`.
+### Insights & Overview
+- `GET /api/insights` – top category, frequent vendor and savings trend
+- `GET /api/overview` – summary for current month
 
-## Insights Endpoint
+### File Upload & Categorization
+- `POST /api/upload` – upload CSV of transactions
+- `POST /api/categorize` – returns category suggestion using OpenAI
 
-`GET /api/insights` returns quick statistics for the authenticated user including the top spending category this month, most frequent vendor and a savings trend for the last three months.
-
-## Overview Endpoint
-
-`GET /api/overview` returns the current month's totals for the authenticated user.
-
-```
+## Sample Request
+```bash
+POST /api/auth/login
+Content-Type: application/json
 {
-  income: number,
-  expenses: number,
-  savings: number
+  "email": "user@example.com",
+  "password": "secret"
 }
 ```
-
-`savings` is calculated as `income - expenses`.
-
-## Categorize Endpoint
-
-`POST /api/categorize` (requires JWT auth) accepts a JSON body with an
-`expenseDescription` string. It returns a suggested category using OpenAI or
-keyword matching.
-
-```
-{
-  "category": "Groceries"
-}
+Response:
+```json
+{ "token": "<jwt>" }
 ```
 
-## Deployment Tips
+## Frontend Features
+- JWT cookie based auth with protected routes
+- Dashboard with income/expense charts
+- Manage budgets, savings, investments and goals
+- CSV upload for bulk transactions
+- Request validation middleware protects the API
+- AI powered expense categorization using OpenAI
 
-When deploying on platforms like **Render** or **Railway**:
+## Folder Structure
+```
+.
+├── server.js
+├── models/
+├── routes/
+├── middleware/
+├── client/
+    ├── src/
+        ├── pages/
+        ├── components/
+        ├── services/
+```
 
-1. Set environment variables from `.env.example` in the service settings. At a minimum you will need `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, and `OPENAI_API_KEY`.
-2. Configure the build/start command to run `node server.js`.
-3. Expose the port defined by the `PORT` variable (these platforms automatically provide one).
-4. Ensure your MongoDB Atlas network rules allow connections from your hosting provider.
+## Deployment
+1. Set env vars from `.env.example` on your host.
+2. Build the frontend:
+   ```bash
+   cd client && npm run build
+   ```
+3. Serve `client/dist` with your preferred server or a static host and run `node server.js`.
+
+## Screenshot
+![Dashboard Screenshot](docs/screenshot.png)
+
+## Contributing
+PRs and issues are welcome! Feel free to open a discussion or contact the maintainer.
 
