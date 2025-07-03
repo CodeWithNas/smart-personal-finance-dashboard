@@ -47,6 +47,7 @@ const Income = () => {
       if (!filterMonth) {
         const res = await api.get('/transactions?type=income');
         const data = res.data || [];
+        console.log('Fetched income data:', data);
         setIncomes(data);
 
         const months = getPreviousMonths(6);
@@ -83,6 +84,7 @@ const Income = () => {
         const responses = await Promise.all(
           months.map((m) => api.get(`/transactions?type=income&month=${m}`))
         );
+        console.log('Fetched income data:', responses.map((r) => r.data));
         const monthly = {};
         responses.forEach((res, idx) => {
           monthly[months[idx]] = res.data;
@@ -233,7 +235,7 @@ const Income = () => {
         <h2 className="text-lg font-semibold mb-2">Recent Entries</h2>
         {loading ? (
           <Spinner />
-        ) : latestEntries.length === 0 ? (
+        ) : incomes.length === 0 || latestEntries.length === 0 ? (
           <p className="text-gray-700">No income data found.</p>
         ) : (
           <div className="overflow-x-auto">
