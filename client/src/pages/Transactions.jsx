@@ -10,6 +10,16 @@ import {
 import { Spinner } from '../components/loading';
 import { incomeCategories, expenseCategories, formatDate } from '../utils';
 
+const formatLongDate = (input) => {
+  const d = new Date(input);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
 const Transactions = () => {
   const [formData, setFormData] = useState({
     type: 'expense',
@@ -28,7 +38,14 @@ const Transactions = () => {
   const [loading, setLoading] = useState(true);
 
 
-  const dynamicCategories = formData.type === 'income' ? incomeCategories : expenseCategories;
+  const dynamicCategories =
+    formData.type === 'income' ? incomeCategories : expenseCategories;
+
+  const isFormValid =
+    formData.type &&
+    formData.amount &&
+    formData.category &&
+    formData.date;
 
   const handleChange = (e) => {
     setFormData({
@@ -111,91 +128,102 @@ const Transactions = () => {
     }
   };
 
+  const clearFilters = () => {
+    setFilterMonth('');
+    setFilterCategory('');
+    setFilterType('');
+  };
+
   useEffect(() => {
     fetchTransactions();
   }, []);
 
   return (
-    <div
-      className="max-w-xl mx-auto bg-white p-6 rounded shadow"
-      aria-busy={loading}
-    >
-      <h1 className="text-3xl font-bold mb-6">Track Income &amp; Expenses</h1>
+    <div className="max-w-4xl mx-auto p-4 space-y-8" aria-busy={loading}>
+      <h1 className="text-3xl font-bold mb-6 text-center">
+        Track Income &amp; Expenses
+      </h1>
 
-      <h2 className="text-2xl font-bold mb-4">
-        {isEditing ? 'Edit Transaction' : 'Add Transaction'}
-      </h2>
+      <div className="bg-white p-6 rounded-xl shadow-md">
+        <h2 className="text-2xl font-bold mb-4">
+          {isEditing ? 'Edit Transaction' : 'Add Transaction'}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="transactionType" className="block mb-1 font-medium">Type</label>
-          <select
-            id="transactionType"
-            name="type"
-            value={formData.type}
+        <form onSubmit={handleSubmit} className="grid gap-4">
+          <NumberInput
+            label="Amount (€)"
+            name="amount"
+            value={formData.amount}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
-          >
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-        </div>
+            autoFocus
+            required
+          />
 
-        <NumberInput
-          label="Amount (€)"
-          name="amount"
-          value={formData.amount}
-          onChange={handleChange}
-          required
-        />
-
-        <CategorySelect
-          label="Category"
-          name="category"
-          value={formData.category}
-          onChange={handleChange}
-          options={dynamicCategories}
-        />
-
-        <DateInput
-          label="Date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-        />
-
-        <TextInput
-          label="Description"
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="e.g. Netflix, Aldi"
-        />
-
-        <div className="flex gap-3">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            {isEditing ? 'Update Transaction' : 'Save Transaction'}
-          </button>
-          {isEditing && (
-            <button
-              type="button"
-              onClick={cancelEdit}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+          <div>
+            <label htmlFor="transactionType" className="block mb-1 font-medium">
+              Type
+            </label>
+            <select
+              id="transactionType"
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
             >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
 
-      <div className="mt-10">
+          <CategorySelect
+            label="Category"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            options={dynamicCategories}
+          />
+
+          <DateInput
+            label="Date"
+            name="date"
+            value={formData.date}
+            onChange={handleChange}
+            required
+          />
+
+          <TextInput
+            label="Description"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="e.g. Rent, Groceries"
+          />
+
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={!isFormValid}
+              className={`px-4 py-2 rounded text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {isEditing ? 'Update Transaction' : 'Save Transaction'}
+            </button>
+            {isEditing && (
+              <button
+                type="button"
+                onClick={cancelEdit}
+                className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </form>
+      </div>
+
+      <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-xl font-semibold mb-3">Recent Transactions</h2>
 
-        <div className="flex flex-wrap gap-4 mb-4">
+        <div className="flex flex-wrap gap-4 mb-4 items-end">
           <div>
             <label htmlFor="txnFilterMonth" className="block text-sm font-medium mb-1">Filter by Month</label>
             <input
@@ -235,6 +263,14 @@ const Transactions = () => {
               <option value="expense">Expense</option>
             </select>
           </div>
+
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="ml-auto bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
+          >
+            Clear Filters
+          </button>
         </div>
 
         {loading ? (
@@ -252,31 +288,49 @@ const Transactions = () => {
                   (filterType === '' || txn.type === filterType)
                 );
               })
-              .map((txn) => (
-                <li key={txn._id} className="border rounded p-4 shadow-sm relative">
-                  <div className="flex justify-between">
-                    <span className="font-medium">{txn.category} ({txn.type})</span>
-                    <span className={txn.type === 'income' ? 'text-green-600' : 'text-red-600'}>
-                      €{txn.amount}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    {formatDate(txn.date)} - {txn.description}
-                  </div>
-                  <button
-                    onClick={() => handleEdit(txn)}
-                    className="absolute top-2 right-16 text-blue-500 hover:text-blue-700 text-sm"
+              .map((txn) => {
+                const truncated =
+                  txn.description && txn.description.length > 30
+                    ? `${txn.description.slice(0, 30)}...`
+                    : txn.description;
+                return (
+                  <li
+                    key={txn._id}
+                    className="border rounded-lg p-4 shadow-sm relative"
                   >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(txn._id)}
-                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
+                    <div className="flex justify-between">
+                      <span className="font-medium">
+                        {txn.category} ({txn.type})
+                      </span>
+                      <span
+                        className={
+                          txn.type === 'income' ? 'text-green-600' : 'text-red-600'
+                        }
+                      >
+                        €{txn.amount}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      {formatLongDate(txn.date)} -{' '}
+                      <span title={txn.description}>{truncated}</span>
+                    </div>
+                    <button
+                      onClick={() => handleEdit(txn)}
+                      title="Edit"
+                      className="absolute top-2 right-16 text-blue-500 hover:text-blue-700 text-sm"
+                    >
+                      🖉
+                    </button>
+                    <button
+                      onClick={() => handleDelete(txn._id)}
+                      title="Delete"
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm"
+                    >
+                      🗑
+                    </button>
+                  </li>
+                );
+              })}
           </ul>
         )}
       </div>
