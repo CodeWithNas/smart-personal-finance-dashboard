@@ -11,7 +11,23 @@ router.use(authMiddleware);
 // ✅ GET all transactions for the logged-in user
 router.get('/', async (req, res) => {
   try {
-    const transactions = await Transaction.find({ userId: req.user.id });
+    const { type, month } = req.query;
+    const filter = { userId: req.user.id };
+
+    if (type) {
+      filter.type = type.toLowerCase();
+    }
+
+    if (month) {
+      const [y, m] = month.split('-');
+      const year = parseInt(y, 10);
+      const monthIdx = parseInt(m, 10) - 1;
+      const start = new Date(year, monthIdx, 1);
+      const end = new Date(year, monthIdx + 1, 1);
+      filter.date = { $gte: start, $lt: end };
+    }
+
+    const transactions = await Transaction.find(filter).sort({ date: -1 });
     res.json(transactions);
   } catch (err) {
     console.error('GET /transactions error:', err);
