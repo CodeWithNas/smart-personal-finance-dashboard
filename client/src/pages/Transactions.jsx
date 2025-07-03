@@ -27,6 +27,8 @@ const Transactions = () => {
     category: '',
     date: '',
     description: '',
+    recurring: false,
+    frequency: 'monthly',
   });
 
   const [transactions, setTransactions] = useState([]);
@@ -35,6 +37,7 @@ const Transactions = () => {
   const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [filterType, setFilterType] = useState('');
+  const [filterRecurring, setFilterRecurring] = useState('');
   const [loading, setLoading] = useState(true);
 
 
@@ -48,9 +51,11 @@ const Transactions = () => {
     formData.date;
 
   const handleChange = (e) => {
+    const value =
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: value,
     });
   };
 
@@ -86,6 +91,8 @@ const Transactions = () => {
       category: txn.category,
       date: txn.date.slice(0, 10),
       description: txn.description,
+      recurring: txn.recurring || false,
+      frequency: txn.frequency || 'monthly',
     });
     setIsEditing(true);
     setEditId(txn._id);
@@ -98,6 +105,8 @@ const Transactions = () => {
       category: '',
       date: '',
       description: '',
+      recurring: false,
+      frequency: 'monthly',
     });
     setIsEditing(false);
     setEditId(null);
@@ -132,6 +141,7 @@ const Transactions = () => {
     setFilterMonth('');
     setFilterCategory('');
     setFilterType('');
+    setFilterRecurring('');
   };
 
   useEffect(() => {
@@ -199,6 +209,36 @@ const Transactions = () => {
             placeholder="e.g. Rent, Groceries"
           />
 
+          <div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="recurring"
+                  checked={formData.recurring}
+                  onChange={handleChange}
+                />
+                Mark as Recurring
+              </label>
+              {formData.recurring && (
+                <select
+                  name="frequency"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  className="border p-2 rounded"
+                >
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly">Quarterly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              )}
+            </div>
+            <p className="text-xs text-gray-600 mt-1">
+              Recurring expenses repeat regularly. Future versions will automate
+              this.
+            </p>
+          </div>
+
           <div className="flex gap-3">
             <button
               type="submit"
@@ -264,6 +304,20 @@ const Transactions = () => {
             </select>
           </div>
 
+          <div>
+            <label htmlFor="txnFilterRecurring" className="block text-sm font-medium mb-1">Filter by Recurring</label>
+            <select
+              id="txnFilterRecurring"
+              value={filterRecurring}
+              onChange={(e) => setFilterRecurring(e.target.value)}
+              className="border p-2 rounded"
+            >
+              <option value="">All</option>
+              <option value="one-time">One-Time</option>
+              <option value="recurring">Recurring</option>
+            </select>
+          </div>
+
           <button
             type="button"
             onClick={clearFilters}
@@ -282,10 +336,15 @@ const Transactions = () => {
             {transactions
               .filter((txn) => {
                 const txnMonth = txn.date?.slice(0, 7);
+                const recMatch =
+                  filterRecurring === '' ||
+                  (filterRecurring === 'recurring' && txn.recurring) ||
+                  (filterRecurring === 'one-time' && !txn.recurring);
                 return (
                   (filterMonth === '' || txnMonth === filterMonth) &&
                   (filterCategory === '' || txn.category === filterCategory) &&
-                  (filterType === '' || txn.type === filterType)
+                  (filterType === '' || txn.type === filterType) &&
+                  recMatch
                 );
               })
               .map((txn) => {
@@ -310,10 +369,15 @@ const Transactions = () => {
                         €{txn.amount}
                       </span>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {formatLongDate(txn.date)} -{' '}
-                      <span title={txn.description}>{truncated}</span>
-                    </div>
+                  <div className="text-sm text-gray-600">
+                    {formatLongDate(txn.date)} -{' '}
+                    <span title={txn.description}>{truncated}</span>
+                    {txn.recurring && (
+                      <span className="ml-2 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+                        🔁 Recurring
+                      </span>
+                    )}
+                  </div>
                     <button
                       onClick={() => handleEdit(txn)}
                       title="Edit"
