@@ -1,5 +1,15 @@
 // src/components/Navbar.jsx
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 const Navbar = ({ toggleSidebar }) => {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
   return (
     <nav className="bg-gray-800 text-white p-4 flex justify-between items-center">
       <button
@@ -24,7 +34,12 @@ const Navbar = ({ toggleSidebar }) => {
       </button>
       <div className="flex-1">Welcome to SPFD</div>
       <div>
-        <button className="bg-gray-600 text-white border-none p-2">Logout</button>
+        <button
+          className="bg-gray-600 text-white border-none p-2"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );

@@ -1,10 +1,15 @@
 // src/components/Layout.jsx
-import { Outlet, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import Navbar from './Navbar';
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="flex min-h-screen">
@@ -22,6 +27,12 @@ const Layout = () => {
         <Link to="/goals">Goals</Link>
         <Link to="/insights">Insights</Link>
       </aside>
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 md:hidden z-10"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* Main Content */}
       <div className="flex flex-col flex-1">

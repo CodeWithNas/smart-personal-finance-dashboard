@@ -2,11 +2,12 @@
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { TextInput } from '../components/forms';
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -22,9 +23,10 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await api.post('/auth/login', formData);
-      localStorage.setItem('token', res.data.token); // ✅ Save token
-      navigate('/dashboard'); // ✅ Redirect
+      const res = await login(formData);
+      if (res.token) {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.error || 'Login failed');
