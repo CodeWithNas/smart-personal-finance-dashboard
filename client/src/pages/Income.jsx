@@ -10,12 +10,18 @@ const COLORS = ['#8884d8', '#82ca9d', '#ffc658', '#ff7f7f', '#a1e3a1', '#ffd700'
 
 const getPreviousMonths = (count, base) => {
   const months = [];
-  const d = base ? new Date(base + '-01') : new Date();
+  const start = base
+    ? new Date(`${base}-01T00:00:00Z`)
+    : new Date();
+
   for (let i = count - 1; i >= 0; i--) {
-    const m = new Date(d.getFullYear(), d.getMonth() - i, 1)
-      .toISOString()
-      .slice(0, 7);
-    months.push(m);
+    const date = new Date(
+      Date.UTC(start.getUTCFullYear(), start.getUTCMonth() - i, 1)
+    );
+    const month = `${date.getUTCFullYear()}-${String(
+      date.getUTCMonth() + 1
+    ).padStart(2, '0')}`;
+    months.push(month);
   }
   return months;
 };
