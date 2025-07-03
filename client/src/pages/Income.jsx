@@ -33,9 +33,7 @@ const Income = () => {
   const [topSource, setTopSource] = useState('');
   const [prevMonthTotal, setPrevMonthTotal] = useState(0);
 
-  const [filterMonth, setFilterMonth] = useState(() =>
-    new Date().toISOString().slice(0, 7)
-  );
+  const [filterMonth, setFilterMonth] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [minAmount, setMinAmount] = useState('');
   const [maxAmount, setMaxAmount] = useState('');
@@ -51,9 +49,12 @@ const Income = () => {
     setLoading(true);
     try {
       if (!filterMonth) {
-        const res = await api.get(
-          `/transactions?type=income&month=${filterMonth}&category=${filterCategory}&min=${minAmount}&max=${maxAmount}`
-        );
+        const params = new URLSearchParams();
+        params.append('type', 'income');
+        if (filterCategory) params.append('category', filterCategory);
+        if (minAmount) params.append('min', minAmount);
+        if (maxAmount) params.append('max', maxAmount);
+        const res = await api.get(`/transactions?${params.toString()}`);
         const data = res.data || [];
         console.log('Fetched income data with filters:', data);
         setIncomes(data);
@@ -91,11 +92,15 @@ const Income = () => {
       } else {
         const months = getPreviousMonths(6, filterMonth);
         const responses = await Promise.all(
-          months.map((m) =>
-            api.get(
-              `/transactions?type=income&month=${m}&category=${filterCategory}&min=${minAmount}&max=${maxAmount}`
-            )
-          )
+          months.map((m) => {
+            const params = new URLSearchParams();
+            params.append('type', 'income');
+            params.append('month', m);
+            if (filterCategory) params.append('category', filterCategory);
+            if (minAmount) params.append('min', minAmount);
+            if (maxAmount) params.append('max', maxAmount);
+            return api.get(`/transactions?${params.toString()}`);
+          })
         );
         console.log('Fetched income data with filters:', responses.map((r) => r.data));
         const monthly = {};
