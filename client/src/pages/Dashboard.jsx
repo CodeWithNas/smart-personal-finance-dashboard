@@ -49,9 +49,10 @@ const Dashboard = () => {
   const netBalance = incomeTotal - expenseTotal;
   const availableBalance = netBalance - savingsTotal;
 
+  const latestCount = Math.min(Math.max(transactions.length, 5), 10);
   const latestFive = [...transactions]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
-    .slice(0, 5);
+    .slice(0, latestCount);
 
   const expenseByCategory = expenses.reduce((acc, txn) => {
     const category = txn.category || 'Other';
