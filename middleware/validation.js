@@ -7,6 +7,12 @@ export const validateTransaction = (req, res, next) => {
   if (isNaN(amt)) {
     return res.status(400).json({ error: 'Invalid or missing amount' });
   }
+  if (
+    req.body.recurringPaused !== undefined &&
+    typeof req.body.recurringPaused !== 'boolean'
+  ) {
+    return res.status(400).json({ error: 'Invalid recurringPaused' });
+  }
   next();
 };
 
@@ -16,6 +22,12 @@ export const validateTransactionUpdate = (req, res, next) => {
   }
   if (req.body.amount !== undefined && isNaN(Number(req.body.amount))) {
     return res.status(400).json({ error: 'Invalid amount' });
+  }
+  if (
+    req.body.recurringPaused !== undefined &&
+    typeof req.body.recurringPaused !== 'boolean'
+  ) {
+    return res.status(400).json({ error: 'Invalid recurringPaused' });
   }
   next();
 };

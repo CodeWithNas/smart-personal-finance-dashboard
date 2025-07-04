@@ -24,6 +24,9 @@ export async function generateRecurringTransactions(userId) {
   const updates = [];
 
   for (const tx of recurringTxns) {
+    if (tx.recurringPaused) {
+      continue;
+    }
     let lastDate = tx.lastGenerated || tx.date;
     const increment =
       tx.frequency === 'monthly' ? 1 : tx.frequency === 'quarterly' ? 3 : 12;
