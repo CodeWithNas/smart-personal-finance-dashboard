@@ -154,8 +154,8 @@ const Transactions = () => {
 
   const applyRecurringExpenses = async () => {
     try {
-      const res = await api.post('/transactions/recurring/apply');
-      toast.success(`Applied ${res.data.created} recurring transactions`);
+      const res = await api.post('/transactions/recurring');
+      toast.success(`Applied ${res.data.generated} recurring transactions`);
       fetchTransactions();
     } catch (error) {
       console.error(
@@ -190,9 +190,16 @@ const Transactions = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-8" aria-busy={loading}>
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Track Income &amp; Expenses
-      </h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Track Income &amp; Expenses</h1>
+        <button
+          type="button"
+          onClick={applyRecurringExpenses}
+          className="bg-purple-500 text-white px-3 py-2 rounded hover:bg-purple-600"
+        >
+          Apply Recurring Expenses
+        </button>
+      </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md">
         <h2 className="text-2xl font-bold mb-4">
@@ -372,13 +379,6 @@ const Transactions = () => {
             className="ml-auto bg-gray-200 px-3 py-2 rounded hover:bg-gray-300"
           >
             Clear Filters
-          </button>
-          <button
-            type="button"
-            onClick={applyRecurringExpenses}
-            className="bg-purple-500 text-white px-3 py-2 rounded hover:bg-purple-600"
-          >
-            Apply Recurring Expenses
           </button>
         </div>
 
