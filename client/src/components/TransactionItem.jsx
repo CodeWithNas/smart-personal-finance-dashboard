@@ -12,12 +12,14 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
     category: transaction.category,
     date: formatDate(transaction.date),
     description: transaction.description || '',
+    recurring: transaction.recurring || false,
+    frequency: transaction.frequency || 'monthly',
   });
 
-  // TODO: Inline Edit Logic
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setForm({ ...form, [e.target.name]: value });
   };
 
   const handleSave = async () => {
@@ -27,6 +29,8 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
         category: form.category,
         date: form.date,
         description: form.description,
+        recurring: form.recurring,
+        frequency: form.frequency,
       });
       toast.success('Transaction updated');
       setIsEditing(false);
@@ -83,6 +87,28 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
             value={form.description}
             onChange={handleChange}
           />
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="recurring"
+                checked={form.recurring}
+                onChange={handleChange}
+              />
+              Recurring
+            </label>
+            <select
+              name="frequency"
+              value={form.frequency}
+              onChange={handleChange}
+              disabled={!form.recurring}
+              className="border p-2 rounded"
+            >
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
           <div className="flex gap-2">
             <button
               onClick={handleSave}
@@ -97,6 +123,8 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
                   category: transaction.category,
                   date: formatDate(transaction.date),
                   description: transaction.description || '',
+                  recurring: transaction.recurring || false,
+                  frequency: transaction.frequency || 'monthly',
                 });
                 setIsEditing(false);
               }}
@@ -123,12 +151,12 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
           <div className="text-sm text-gray-600">
             {formattedDate} - <span title={transaction.description}>{truncated}</span>
             {transaction.recurring && (
-              <span className="ml-2 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
+              <span className="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">
                 ♻️ Recurring
               </span>
             )}
             {transaction.recurringPaused && (
-              <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">
+              <span className="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded">
                 ⏸ Paused
               </span>
             )}
@@ -136,15 +164,20 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
           {transaction.lastGenerated && (
             <div className="text-xs text-gray-500 mt-1">
               Last generated:{' '}
-              {new Date(transaction.lastGenerated).toLocaleDateString()}
+              {new Date(transaction.lastGenerated).toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
             </div>
           )}
           {transaction.recurring && (
             <button
               onClick={handleTogglePause}
-              className="absolute top-2 right-32 text-yellow-500 hover:text-yellow-700 text-sm"
+              title="Pause/Resume this recurring transaction"
+              className="absolute top-2 right-32 text-gray-500 hover:text-gray-700 text-sm"
             >
-              {transaction.recurringPaused ? 'Resume' : 'Pause'}
+              {transaction.recurringPaused ? '▶️' : '⏸'}
             </button>
           )}
           <button
