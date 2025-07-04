@@ -12,6 +12,7 @@ const TransactionSchema = new mongoose.Schema({
   category: { type: String },
   date: { type: Date, default: Date.now },
   recurring: { type: Boolean, default: false },
+  recurringPaused: { type: Boolean, default: false },
   frequency: {
     type: String,
     enum: ['monthly', 'quarterly', 'yearly'],
