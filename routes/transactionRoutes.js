@@ -2,6 +2,7 @@ import express from 'express';
 import Transaction from '../models/Transaction.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import { validateTransaction, validateTransactionUpdate } from '../middleware/validation.js';
+import { generateRecurringTransactions } from '../utils/recurring.js';
 
 const router = express.Router();
 
@@ -123,56 +124,14 @@ router.patch('/:id', validateTransactionUpdate, async (req, res) => {
   }
 });
 
-// TODO: Recurring Expense Automation Logic
-router.post('/recurring/apply', async (req, res) => {
+// ✅ Generate new entries for recurring transactions
+router.post('/recurring', async (req, res) => {
   try {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
-    const prevMonthStart = new Date(currentYear, currentMonth - 1, 1);
-    const prevMonthEnd = new Date(currentYear, currentMonth, 1);
-
-    const recurringTxns = await Transaction.find({
-      userId: req.user.id,
-      recurring: true,
-      date: { $gte: prevMonthStart, $lt: prevMonthEnd },
-    });
-
-    let created = 0;
-
-    for (const tx of recurringTxns) {
-      const newDate = new Date(currentYear, currentMonth, tx.date.getDate());
-      const start = new Date(newDate);
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(newDate);
-      end.setHours(23, 59, 59, 999);
-
-      const exists = await Transaction.findOne({
-        userId: req.user.id,
-        category: tx.category,
-        date: { $gte: start, $lte: end },
-      });
-
-      if (exists) continue;
-
-      await Transaction.create({
-        userId: req.user.id,
-        type: tx.type,
-        vendor: tx.vendor,
-        amount: tx.amount,
-        category: tx.category,
-        date: newDate,
-        recurring: tx.recurring,
-        frequency: tx.frequency,
-        description: tx.description,
-      });
-      created++;
-    }
-
-    res.json({ created });
+    const result = await generateRecurringTransactions(req.user.id);
+    res.json(result);
   } catch (err) {
-    console.error('POST /transactions/recurring/apply error:', err);
-    res.status(500).json({ error: 'Failed to apply recurring transactions' });
+    console.error('POST /transactions/recurring error:', err);
+    res.status(500).json({ error: 'Failed to generate recurring transactions' });
   }
 });
 

@@ -17,6 +17,7 @@ const TransactionSchema = new mongoose.Schema({
     enum: ['monthly', 'quarterly', 'yearly'],
     default: 'monthly',
   },
+  lastGenerated: { type: Date },
   description: { type: String }, // Optional but useful for UI
 });
 
