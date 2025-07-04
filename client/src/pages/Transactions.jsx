@@ -152,10 +152,10 @@ const Transactions = () => {
     setFilterRecurring('');
   };
 
-  const applyRecurringExpenses = async () => {
+  const triggerRecurringNow = async () => {
     try {
       const res = await api.post('/transactions/recurring');
-      toast.success(`Applied ${res.data.generated} recurring transactions`);
+      toast.success(`Generated ${res.data.generated} transactions`);
       fetchTransactions();
     } catch (error) {
       console.error(
@@ -192,13 +192,6 @@ const Transactions = () => {
     <div className="max-w-4xl mx-auto p-4 space-y-8" aria-busy={loading}>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Track Income &amp; Expenses</h1>
-        <button
-          type="button"
-          onClick={applyRecurringExpenses}
-          className="bg-purple-500 text-white px-3 py-2 rounded hover:bg-purple-600"
-        >
-          Apply Recurring Expenses
-        </button>
       </div>
 
       <div className="bg-white p-6 rounded-xl shadow-md">
@@ -267,18 +260,17 @@ const Transactions = () => {
                 />
                 Mark as Recurring
               </label>
-              {formData.recurring && (
-                <select
-                  name="frequency"
-                  value={formData.frequency}
-                  onChange={handleChange}
-                  className="border p-2 rounded"
-                >
-                  <option value="monthly">Monthly</option>
-                  <option value="quarterly">Quarterly</option>
-                  <option value="yearly">Yearly</option>
-                </select>
-              )}
+              <select
+                name="frequency"
+                value={formData.frequency}
+                onChange={handleChange}
+                disabled={!formData.recurring}
+                className="border p-2 rounded"
+              >
+                <option value="monthly">Monthly</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="yearly">Yearly</option>
+              </select>
             </div>
             <p className="text-xs text-gray-600 mt-1">
               Recurring expenses repeat regularly. Future versions will automate
@@ -399,6 +391,17 @@ const Transactions = () => {
           </ul>
         )}
       </div>
+      {import.meta.env.DEV && (
+        <div className="text-right mt-4">
+          <button
+            type="button"
+            onClick={triggerRecurringNow}
+            className="bg-purple-500 text-white px-3 py-2 rounded hover:bg-purple-600"
+          >
+            Trigger Recurring Now
+          </button>
+        </div>
+      )}
     </div>
   );
 };
