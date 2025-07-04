@@ -37,6 +37,21 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
     }
   };
 
+  const handleTogglePause = async () => {
+    try {
+      await api.patch(`/transactions/${transaction._id}`, {
+        recurringPaused: !transaction.recurringPaused,
+      });
+      toast.success(
+        transaction.recurringPaused ? 'Recurring resumed' : 'Recurring paused'
+      );
+      if (onUpdate) onUpdate();
+    } catch (err) {
+      console.error('Toggle pause error:', err.response?.data || err.message);
+      toast.error(err.response?.data?.message || err.message);
+    }
+  };
+
   const categories =
     transaction.type === 'income' ? incomeCategories : expenseCategories;
 
@@ -109,10 +124,29 @@ const TransactionItem = ({ transaction, onDelete, onUpdate }) => {
             {formattedDate} - <span title={transaction.description}>{truncated}</span>
             {transaction.recurring && (
               <span className="ml-2 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">
-                🔁 Recurring
+                ♻️ Recurring
+              </span>
+            )}
+            {transaction.recurringPaused && (
+              <span className="ml-2 px-2 py-0.5 text-xs bg-yellow-100 text-yellow-700 rounded-full">
+                ⏸ Paused
               </span>
             )}
           </div>
+          {transaction.lastGenerated && (
+            <div className="text-xs text-gray-500 mt-1">
+              Last generated:{' '}
+              {new Date(transaction.lastGenerated).toLocaleDateString()}
+            </div>
+          )}
+          {transaction.recurring && (
+            <button
+              onClick={handleTogglePause}
+              className="absolute top-2 right-32 text-yellow-500 hover:text-yellow-700 text-sm"
+            >
+              {transaction.recurringPaused ? 'Resume' : 'Pause'}
+            </button>
+          )}
           <button
             onClick={() => setIsEditing(true)}
             className="absolute top-2 right-16 text-blue-500 hover:text-blue-700 text-sm"
